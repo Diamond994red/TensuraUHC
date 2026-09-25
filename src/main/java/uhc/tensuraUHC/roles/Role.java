@@ -25,7 +25,8 @@ public abstract class Role implements Listener {
         SOLITAIRE(ChatColor.GOLD + "Solitaire", ChatColor.GOLD),
         OCTAGRAMME(ChatColor.DARK_PURPLE + "les rois démons", ChatColor.DARK_PURPLE),
         LIMULE(ChatColor.DARK_GREEN + "Limule et ses alliés (hors fédération de Jura)", ChatColor.DARK_GREEN),
-        SHIZUE(ChatColor.LIGHT_PURPLE + "Votre âme soeur", ChatColor.LIGHT_PURPLE);
+        SHIZUE(ChatColor.LIGHT_PURPLE + "Votre âme soeur", ChatColor.LIGHT_PURPLE),
+        CLOWNS(ChatColor.DARK_BLUE + "les clowns", ChatColor.DARK_BLUE);
         private final String displayName;
         private final ChatColor color;
 

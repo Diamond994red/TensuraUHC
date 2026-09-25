@@ -226,6 +226,7 @@ public class GameManager {
         messagesVictoire.put(Role.Camp.HUMAINS, "des Humains !");
         messagesVictoire.put(Role.Camp.SHIZUE, "de Shizue et Limule !");
         messagesVictoire.put(Role.Camp.OCTAGRAMME, "de l'Octagramme !");
+        messagesVictoire.put(Role.Camp.CLOWNS, "des Clowns !");
         if (role != null) {
             messagesVictoire.put(Role.Camp.SOLITAIRE, "de " + role.getName() + " !");
         }

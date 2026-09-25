@@ -260,7 +260,9 @@ public class InventoryListener implements Listener {
             } else if (slot == 4) {
                 main.getGuiManager().openRoleCategoryMenu(player, "Camp : Solos",Role.Camp.SOLITAIRE);
             } else if (slot == 12) {
-                main.getGuiManager().openRoleCategoryMenu(player, "Camp : Monstres",Role.Camp.MONSTRES);
+                main.getGuiManager().openRoleCategoryMenu(player, "Camp : Monstres",Role.Camp.MONSTRES);}
+            else if (slot == 13) {
+                main.getGuiManager().openRoleCategoryMenu(player, "Camp : Clowns",Role.Camp.CLOWNS);
             } else if (slot == 22) {
                 main.getGuiManager().openRoleCategoryMenu(player, "Camp : Octagramme",Role.Camp.OCTAGRAMME);
             } else if (slot == 14) {

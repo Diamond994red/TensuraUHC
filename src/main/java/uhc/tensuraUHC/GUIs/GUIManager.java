@@ -568,6 +568,7 @@ public class GUIManager {
         gui.setItem(4, createItem(Material.NETHER_STAR, ChatColor.GOLD + "Solos", ChatColor.GRAY + "Configurer les rôles Solos."));
         gui.setItem(12, createItem(Material.ROTTEN_FLESH, ChatColor.DARK_GREEN + "Monstres", ChatColor.GRAY + "Configurer le camp des Monstres."));
         gui.setItem(22, createItem(Material.BEACON, ChatColor.YELLOW + "Octagramme", ChatColor.GRAY + "Configurer le camp de l'Octagramme."));
+        gui.setItem(13, createItem(Material.ENDER_STONE, ChatColor.DARK_BLUE + "Clowns", ChatColor.GRAY + "Configurer le camp des clowns"));
         gui.setItem(14, createItem(Material.IRON_CHESTPLATE, ChatColor.AQUA + "Humains", ChatColor.GRAY + "Configurer le camp des Humains."));
         gui.setItem(26, createItem(Material.BANNER, ChatColor.AQUA + "Composition", ChatColor.GRAY + "Gérer les événements pendant la partie."));
         // Bouton Retour au menu des paramètres de la partie
