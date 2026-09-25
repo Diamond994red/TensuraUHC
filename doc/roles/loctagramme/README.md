@@ -1,0 +1,3 @@
+# 8️⃣ L'octagramme
+
+L'octogramme est un camp spécial où les rois démons peuvent faire des alliances avec deux autres rois pour gagner. Pour faire d'autres alliances, il faut attendre 10 min après la conclusion de la dernière alliance. Un roi démon d'une alliance peut en rejoindre un autre et donc quitter celle existante. l'alliance quitté recevra un message 1 min plus tard que le roi démon est parti. Pour créer une alliance, il faut utiliser la commande /ts alli et un inventaire s'ouvrira avec les rois démons restants. Une alliance avec Limule est possible si il ne reste qu'un autre roi. Si Limule a pris le pacte 4, il devra gagner avec le roi démon si il accepte l'alliance.
