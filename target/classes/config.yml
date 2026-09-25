@@ -1,0 +1,15 @@
+enchants:
+  iron:
+    sharpness: 3
+    protection: 3
+    knockback: 0
+    fire: 0
+  diamond:
+    sharpness: 3
+    protection: 2
+    knockback: 0
+    fire: 0
+  bow:
+    power : 3
+    punch : 0
+    flame : 1
