@@ -31,7 +31,7 @@ public class SoeiRole extends Role {
                 "Ninja et espion hors-pair au service de Limule.\n" +
                         "Vous êtes invisible tant que vous ne portez aucune armure.\n" +
                         "Posez votre fil au sol pour analyser les 3 prochains joueurs qui passeront à proximité.");
-
+        addPassiveEffect(PotionEffectType.SPEED, 0);
         addPower("Infiltration", "Vous devenez invisible lorsque vous ne portez aucune pièce d'armure.");
         addPower("Fil d'écoute", "Posez votre fil au sol pour révéler le rôle, le camp et les effets des 3 prochains joueurs s'en approchant.");
     }

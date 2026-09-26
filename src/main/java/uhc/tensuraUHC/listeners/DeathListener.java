@@ -42,6 +42,7 @@ public class DeathListener implements Listener {
             if (deathLocation.getWorld() != null) {
                 deathLocation.getWorld().dropItemNaturally(deathLocation, new ItemStack(Material.GOLDEN_APPLE, 1));
             }
+            main.getRoleManager().removeRole(victim);
         }
 
         // 3. ACTIONS DIFFÉRÉES (Respawn & Téléportation au tick suivant)

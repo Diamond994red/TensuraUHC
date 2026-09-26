@@ -67,6 +67,7 @@ public class YuukiRole extends Role {
         }
         else if (victimRole instanceof SoeiRole) {
             this.stolenSoeiPower = new SoeiPower(main);
+            this.stolenSoeiPower.activate(killer);
             killer.sendMessage(ChatColor.GREEN + "Vous pouvez maintenant vous mettre invisible en enlevant votre armure.");
         }
         else {

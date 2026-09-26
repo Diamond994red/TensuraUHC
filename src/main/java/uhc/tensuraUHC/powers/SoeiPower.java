@@ -6,6 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -13,6 +15,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
+import uhc.tensuraUHC.roles.list.MonstersCamp.SoeiRole;
+import uhc.tensuraUHC.roles.list.SoloCamp.YuukiRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +25,15 @@ public class SoeiPower {
 
     private final TensuraUHC main;
     private BukkitTask invisibilityTask;
-    private BukkitTask auraTask;
+    private boolean hasArmor =false;
+    static List<Player> players = new ArrayList<>();
 
     public SoeiPower(TensuraUHC main) {
         this.main = main;
+    }
+
+    public static List<Player> getPlayers() {
+        return players;
     }
 
     public static ItemStack createItem() {
@@ -33,6 +42,7 @@ public class SoeiPower {
     }
 
     public void activate(Player player) {
+        players.add(player);
         startInvisibilityCheck(player);
     }
 
@@ -46,7 +56,6 @@ public class SoeiPower {
             public void run() {
                 if (!player.isOnline()) return;
 
-                boolean hasArmor = false;
                 for (ItemStack armorPiece : player.getEquipment().getArmorContents()) {
                     if (armorPiece != null && armorPiece.getType() != Material.AIR) {
                         hasArmor = true;
@@ -56,8 +65,6 @@ public class SoeiPower {
 
                 if (!hasArmor) {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999 * 20, 0, false, false));
-                    //ajouter le fait d'enlever les particules
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999 * 20, 0, false, false));
                     if (!added)
                     {
                         added = true;
@@ -73,7 +80,6 @@ public class SoeiPower {
                     }
                     if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                         player.removePotionEffect(PotionEffectType.INVISIBILITY);
-                        player.removePotionEffect(PotionEffectType.SPEED);
                     }
                 }
             }
@@ -86,5 +92,6 @@ public class SoeiPower {
             invisibilityTask.cancel();
             invisibilityTask = null;
         }
+        players.clear();
     }
 }

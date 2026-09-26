@@ -117,9 +117,7 @@ public class ShizuRole extends Role {
 
                         Role nearbyRole = main.getRoleManager().getPlayerRole(nearby);
                         if (nearbyRole == null) continue;
-
                         String roleName = nearbyRole.getName();
-
                         if (roleName.equals("Limule")) {
                             limuleTime++;
                             CurrentLimuleTime++;

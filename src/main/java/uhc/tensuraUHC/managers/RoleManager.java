@@ -74,6 +74,10 @@ public class RoleManager {
             {
                 players.get(i).setMaxHealth(26.0);
             }
+            else
+            {
+                players.get(i).setMaxHealth(20.0);
+            }
         }
     }
 

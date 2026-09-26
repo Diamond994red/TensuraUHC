@@ -1,5 +1,6 @@
 package uhc.tensuraUHC.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,7 +12,10 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import uhc.tensuraUHC.TensuraUHC;
+import uhc.tensuraUHC.powers.SoeiPower;
 
 public class ItemRestrictionListener implements Listener {
 
@@ -100,8 +104,8 @@ public class ItemRestrictionListener implements Listener {
             }
         }
         if (item.getType() == Material.MILK_BUCKET) {
-                event.setCancelled(true);
-                event.getPlayer().sendMessage(ChatColor.RED + "[TensuraUHC] Cet objet est désactivé !");
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "[TensuraUHC] Cet objet est désactivé !");
         }
 
         // Bloquer la consommation pour d'autres objets désactivés si besoin
@@ -109,7 +113,44 @@ public class ItemRestrictionListener implements Listener {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "[TensuraUHC] Cet objet est désactivé !");
         }
+        if (event.getItem().getType() == Material.GOLDEN_APPLE && event.getItem().getDurability() == 0) {
+            Player player = event.getPlayer();
+
+            boolean eligible = false;
+            boolean hasArmor = false;
+            for (Player pl : SoeiPower.getPlayers()) {
+                if (pl == player) {
+                    eligible = true;
+                }
+            }
+            for (ItemStack armorPiece : player.getEquipment().getArmorContents()) {
+                if (armorPiece != null && armorPiece.getType() != Material.AIR) {
+                    hasArmor = true;
+                    break;
+                }
+            }
+            if (eligible && !hasArmor) {
+                event.setCancelled(true);
+
+                if (item.getAmount() > 1) {
+                    item.setAmount(item.getAmount() - 1);
+                } else {
+                    // Selon le slot utilisé
+                    if (player.getItemInHand().equals(item)) {
+                        player.setItemInHand(null);
+                    }
+                }
+
+                player.setFoodLevel(Math.min(20, player.getFoodLevel() + 4));
+                player.setSaturation(Math.min(player.getFoodLevel(), player.getSaturation() + 9.6f));
+                Bukkit.getScheduler().runTask(main, () -> {
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 120 * 20, 0, false, false));
+                    player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 5 * 20, 1, false, false));
+                });
+            }
+        }
     }
+
 
     // =========================================================================
     // 4. INTERACTION SUR ENTITÉ (Canne à pêche, etc.)
