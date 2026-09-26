@@ -1,4 +1,4 @@
-package uhc.tensuraUHC.roles.list;
+package uhc.tensuraUHC.roles.list.SoloCamp;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,6 +13,7 @@ import org.bukkit.enchantments.Enchantment;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.powers.*;
 import uhc.tensuraUHC.roles.Role;
+import uhc.tensuraUHC.roles.list.MonstersCamp.SoeiRole;
 
 import java.util.ArrayList;
 import java.util.List;

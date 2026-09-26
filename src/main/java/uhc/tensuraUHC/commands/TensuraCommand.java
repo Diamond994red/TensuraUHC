@@ -7,11 +7,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
-import uhc.tensuraUHC.roles.list.YuukiRole;
+import uhc.tensuraUHC.roles.list.SoloCamp.YuukiRole;
 
 import java.util.ArrayList;
 import java.util.List;

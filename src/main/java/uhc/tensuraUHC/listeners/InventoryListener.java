@@ -13,7 +13,7 @@ import org.bukkit.scoreboard.Team;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.managers.ScenarioManager;
 import uhc.tensuraUHC.roles.Role;
-import uhc.tensuraUHC.roles.list.YuukiRole;
+import uhc.tensuraUHC.roles.list.SoloCamp.YuukiRole;
 import uhc.tensuraUHC.scenarios.Scenario;
 
 import java.util.Collections;

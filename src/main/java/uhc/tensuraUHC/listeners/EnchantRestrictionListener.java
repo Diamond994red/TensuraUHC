@@ -46,7 +46,7 @@ public class EnchantRestrictionListener implements Listener {
 
         if (modified && player != null) {
             player.sendMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.RED +
-                    "L'enchantement dépasse la limite autorisée pour votre rôle et a été réduit !");
+                    "L'enchantement dépasse la limite autorisée et a été réduit au niveau max autorisé!");
         }
     }
 

@@ -73,22 +73,6 @@ public class ItemBuilder {
         return this;
     }
 
-    // Colore une armure en cuir (ex: armure de rôle Tensura)
-    public ItemBuilder setArmorColor(Color color) {
-        if (meta instanceof LeatherArmorMeta) {
-            ((LeatherArmorMeta) meta).setColor(color);
-        }
-        return this;
-    }
-
-    // Définit la tête de joueur d'un joueur spécifique
-    public ItemBuilder setSkullOwner(String owner) {
-        if (meta instanceof SkullMeta) {
-            ((SkullMeta) meta).setOwner(owner);
-        }
-        return this;
-    }
-
     // Construit et retourne l'ItemStack final
     public ItemStack build() {
         item.setItemMeta(meta);

@@ -1,4 +1,4 @@
-package uhc.tensuraUHC.roles.list;
+package uhc.tensuraUHC.roles.list.MonstersCamp;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

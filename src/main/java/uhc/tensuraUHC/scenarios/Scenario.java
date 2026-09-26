@@ -24,11 +24,9 @@ public abstract class Scenario implements Listener {
     public Material getIcon() { return icon; }
     public String getDescription() { return description; }
     public boolean isEnabled() { return enabled; }
-
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-
     public void toggle() {
         this.enabled = !this.enabled;
     }

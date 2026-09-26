@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
-import uhc.tensuraUHC.roles.list.LimuleRole;
+import uhc.tensuraUHC.roles.list.MonstersCamp.LimuleRole;
 
 public class testCommand implements CommandExecutor {
 

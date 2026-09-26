@@ -38,7 +38,6 @@ public class TensuraUHC extends JavaPlugin {
     private int PvpTime = 1200;
     private boolean awaitingGameNameInput = false;
     private boolean gameStarted = false;
-
     // --- Configuration du Monde et des Minerais ---
     private int caveSizePercent = 100;
     private int diamondPercent = 100;
@@ -49,7 +48,6 @@ public class TensuraUHC extends JavaPlugin {
     private int coalPercent = 100;
     private int emeraldPercent = 100;
     private int xpPercent = 100;
-
     // --- Gestion des Rôles & Sécurité ---
     private UUID hostUUID;
     private final List<UUID> coHostUUIDs = new ArrayList<>();
@@ -67,6 +65,8 @@ public class TensuraUHC extends JavaPlugin {
         this.scoreboardManager = new ScoreboardManager(this);
         this.roleManager = new RoleManager(this);
         this.scenarioManager = new ScenarioManager(this);
+        CraftManager craftManager = new CraftManager(this);
+        craftManager.registerCrafts();
         // 2. Enregistrement des Listeners
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
@@ -83,6 +83,7 @@ public class TensuraUHC extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DropListener(this), this);
         // 3. Enregistrement des Commandes
         HostCommand hostCmd = new HostCommand(this);
+        PlayerCommand playerCommand = new PlayerCommand(this);
         getCommand("host").setExecutor(hostCmd);
         getCommand("cohost").setExecutor(hostCmd);
         getCommand("revive").setExecutor(hostCmd);
@@ -93,14 +94,11 @@ public class TensuraUHC extends JavaPlugin {
         getCommand("enchant").setExecutor(new HostCommand(this));
         getCommand("setgroup").setExecutor(new HostCommand(this));
         getCommand("giveall").setExecutor(new HostCommand(this));
-        PlayerCommand playerCommand = new PlayerCommand(this);
         getCommand("inv").setExecutor(playerCommand);
         getCommand("helpop").setExecutor(playerCommand);
         getCommand("rule").setExecutor(playerCommand);
         getCommand("tr").setExecutor(new TensuraCommand(this));
         getCommand("testdeath").setExecutor(new testCommand(this));
-        CraftManager craftManager = new CraftManager(this);
-        craftManager.registerCrafts();
 
         saveDefaultConfig();
         loadConfiguration();
@@ -116,9 +114,6 @@ public class TensuraUHC extends JavaPlugin {
 
     // --- Méthodes Utilitaires ---
 
-    /**
-     * Donne l'étoile du Nether "Menu" dans le slot 4 si le joueur est Host ou Co-Host.
-     */
     public void giveMenuItem(Player player) {
         if (isHostOrCoHost(player)) {
             ItemStack menuStar = new ItemBuilder(Material.NETHER_STAR)
@@ -131,9 +126,6 @@ public class TensuraUHC extends JavaPlugin {
         }
     }
 
-    /**
-     * Met à jour le préfixe [HOST] ou [CO-HOST] du joueur sur le Scoreboard général et le Tablist.
-     */
     public void updatePlayerPrefix(Player player) {
         Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
 
@@ -155,7 +147,6 @@ public class TensuraUHC extends JavaPlugin {
             playerTeam.setPrefix(ChatColor.GRAY + "");
         }
 
-        // Retrait des équipes précédentes
         hostTeam.removeEntry(player.getName());
         coHostTeam.removeEntry(player.getName());
         playerTeam.removeEntry(player.getName());
@@ -171,9 +162,6 @@ public class TensuraUHC extends JavaPlugin {
         giveMenuItem(player);
     }
 
-    /**
-     * Construit la plateforme/cage en verre du Lobby d'attente au point d'apparition.
-     */
     public void buildGlassCage(Location center) {
         World world = center.getWorld();
         if (world == null) return;
@@ -200,23 +188,14 @@ public class TensuraUHC extends JavaPlugin {
         }
     }
 
-    /**
-     * Vérifie si un joueur est Host principal.
-     */
     public boolean isHost(Player player) {
         return hostUUID != null && hostUUID.equals(player.getUniqueId());
     }
 
-    /**
-     * Vérifie si un joueur est Co-Host.
-     */
     public boolean isCoHost(Player player) {
         return coHostUUIDs.contains(player.getUniqueId());
     }
 
-    /**
-     * Vérifie si un joueur est Host ou Co-Host (ou OP).
-     */
     public boolean isHostOrCoHost(Player player) {
         return isHost(player) || isCoHost(player) || player.isOp();
     }
@@ -244,7 +223,6 @@ public class TensuraUHC extends JavaPlugin {
     }
 
     // --- Getters et Setters ---
-
 
     public BorderManager getBorderManager() { return borderManager; }
     public GUIManager getGuiManager() { return guiManager; }
@@ -328,41 +306,30 @@ public class TensuraUHC extends JavaPlugin {
     public int getGroupSize() { return groupSize; }
     public void setGroupSize(int groupSize) { this.groupSize = groupSize; }
 
-    // --- TIMER MEETUP ---
     private int meetupTime = 3600; // En secondes (ex: 60 min)
     private boolean isMeetupActive = false;
 
-    // --- CYCLE JOUR / NUIT ---
-    private int dayNightCycleSeconds = 600; // Durée totale du cycle (ex: 10 min)
-    private int dayPercent = 50; // 50% de jour / 50% de nuit
+    private int dayNightCycleSeconds = 600;
+    private int dayPercent = 50;
 
-    // Getters et Setters pour le Meetup
     public int getMeetupTime() { return meetupTime; }
     public void setMeetupTime(int meetupTime) { this.meetupTime = meetupTime; }
     public boolean isMeetupActive() { return isMeetupActive; }
     public void setMeetupActive(boolean active) { this.isMeetupActive = active; }
-
-    // Getters et Setters pour le Cycle Jour/Nuit
     public int getDayNightCycleSeconds() { return dayNightCycleSeconds; }
     public void setDayNightCycleSeconds(int seconds) { this.dayNightCycleSeconds = seconds; }
     public int getDayPercent() { return dayPercent; }
     public void setDayPercent(int percent) { this.dayPercent = percent; }
     public boolean isDay() {
-        if (dayNightCycleSeconds <= 0) return true; // Sécurité division par 0
-
-        // Position actuelle dans le cycle récurrent (ex: 750s % 600s = 150s)
+        if (dayNightCycleSeconds <= 0) return true;
         int currentCycleTime = getGameManager().GetTotalGameSeconds() % dayNightCycleSeconds;
-
-        // Calcul de la durée exacte du jour dans un cycle (ex: 600s * 70% = 420s)
         int dayDurationSeconds = (dayNightCycleSeconds * dayPercent) / 100;
-
-        // Si le temps dans le cycle est inférieur à la durée du jour, il fait jour
         return currentCycleTime < dayDurationSeconds;
     }
 
     private int borderInitialSize = 2000;
     private int borderFinalSize = 200;
-    private int borderShrinkDuration = 1200; // en secondes
+    private int borderShrinkDuration = 1200;
     private boolean borderInstant = false;
 
     public int getBorderInitialSize() { return borderInitialSize; }
@@ -383,11 +350,9 @@ public class TensuraUHC extends JavaPlugin {
     }
 
     public void setCritDamageMultiplier(double critDamageMultiplier) {
-        // Arrondit à 2 décimales pour éviter les imprécisions de calcul
         this.critDamageMultiplier = Math.round(critDamageMultiplier * 100.0) / 100.0;
     }
 
-    // Liste des objets désactivés (si le Material est dedans = INTERDIT)
     private final Set<Material> disabledItems = new HashSet<>();
 
     public Set<Material> getDisabledItems() {
@@ -423,8 +388,8 @@ public class TensuraUHC extends JavaPlugin {
     public void setChatMuted(boolean chatMuted) {
         this.chatMuted = chatMuted;
     }
-    private int maxDiamondArmorPieces = 2; // Exemple: Max 2 pièces en diamant (ex: Casque + Plastron)
-    private int maxMinedDiamonds = 19;     // Limite de diamants minés par joueur
+    private int maxDiamondArmorPieces = 2;
+    private int maxMinedDiamonds = 19;
 
     public int getMaxDiamondArmorPieces() { return maxDiamondArmorPieces; }
     public void setMaxDiamondArmorPieces(int max) { this.maxDiamondArmorPieces = Math.max(0, Math.min(4, max)); }
@@ -434,22 +399,15 @@ public class TensuraUHC extends JavaPlugin {
     }
 
     private final Map<UUID, Integer> minedDiamondsMap = new HashMap<>();
-    /**
-     * Incrémente de 1 le nombre de diamants minés par le joueur.
-     */
     public void incrementMinedDiamonds(Player player) {
         int current = getMinedDiamonds(player);
         minedDiamondsMap.put(player.getUniqueId(), current + 1);
     }
 
-    /**
-     * Réinitialise les données des diamants (à appeler au lancement ou à la fin d'une partie).
-     */
     public void resetMinedDiamonds() {
         minedDiamondsMap.clear();
     }
 
-    // Getteurs / Setteurs pour le max
     public int getMaxMinedDiamonds() {
         return maxMinedDiamonds;
     }
@@ -458,9 +416,6 @@ public class TensuraUHC extends JavaPlugin {
         this.maxMinedDiamonds = maxMinedDiamonds;
     }
 
-    // ==========================================
-// VARIABLES & VALEURS PAR DÉFAUT (ENCHANTS)
-// ==========================================
     private int ironSharpnessMax = 2;
     private int ironProtectionMax = 3;
     private int ironKnockbackMax = 0;
@@ -471,9 +426,6 @@ public class TensuraUHC extends JavaPlugin {
     private int diamondKnockbackMax = 0;
     private int diamondFireMax = 0;
 
-    // ==========================================
-// GETTERS & SETTERS : ENCHANTS FER
-// ==========================================
     public int getIronSharpnessMax() {
 
         return ironSharpnessMax;
@@ -508,9 +460,6 @@ public class TensuraUHC extends JavaPlugin {
         this.ironFireMax = ironFireMax;
     }
 
-    // ==========================================
-// GETTERS & SETTERS : ENCHANTS DIAMANT
-// ==========================================
     public int getDiamondSharpnessMax() {
         return diamondSharpnessMax;
     }
@@ -609,12 +558,10 @@ public class TensuraUHC extends JavaPlugin {
         return scenarioManager;
     }
 
-    // --- VARIABLES POUR LES RATES DE DROP (Valeurs par défaut en %) ---
     private int appleDropPercent = 10;
     private int flintDropPercent = 50;
     private int enderPearlDropPercent = 10;
 
-    // --- GETTERS & SETTERS ---
     public int getAppleDropPercent() {
         return appleDropPercent;
     }

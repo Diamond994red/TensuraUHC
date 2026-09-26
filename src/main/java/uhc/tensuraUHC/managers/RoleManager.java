@@ -1,12 +1,14 @@
 package uhc.tensuraUHC.managers;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
-import uhc.tensuraUHC.roles.list.*;
+import uhc.tensuraUHC.roles.list.ClownsCamp.*;
+import uhc.tensuraUHC.roles.list.HumansCamp.*;
+import uhc.tensuraUHC.roles.list.MonstersCamp.*;
+import uhc.tensuraUHC.roles.list.OctagramCamp.*;
+import uhc.tensuraUHC.roles.list.SoloCamp.*;
 
 import java.util.*;
 
