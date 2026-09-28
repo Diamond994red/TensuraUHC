@@ -44,6 +44,7 @@ public abstract class Role implements Listener {
     protected final TensuraUHC main;
     private final String name;
     private Camp camp;
+    private Camp initialCamp;
     private final String description;
     private final List<PotionEffect> passiveEffects;
     private final List<String> powers;
@@ -55,6 +56,7 @@ public abstract class Role implements Listener {
         this.main = main;
         this.name = name;
         this.camp = camp;
+        this.initialCamp = camp;
         this.description = description;
         this.passiveEffects = new ArrayList<>();
         this.powers = new ArrayList<>();
@@ -100,6 +102,7 @@ public abstract class Role implements Listener {
     // Getters et Setters
     public String getName() { return name; }
     public Camp getCamp() { return camp; }
+    public Camp getInitialCamp() { return initialCamp; }
     public void setCamp(Camp camp) { this.camp = camp; }
     public String getDescription() { return description; }
     public List<PotionEffect> getPassiveEffects() { return passiveEffects; }

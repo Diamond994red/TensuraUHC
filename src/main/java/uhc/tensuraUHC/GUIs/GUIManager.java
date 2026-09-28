@@ -583,7 +583,7 @@ public class GUIManager {
 
         int slot = 0;
         for (Role role : main.getRoleManager().getRoles()) {
-            if (camp != null && role.getCamp() != camp) {
+            if (camp != null && role.getInitialCamp() != camp) {
                 continue;
             }
 
