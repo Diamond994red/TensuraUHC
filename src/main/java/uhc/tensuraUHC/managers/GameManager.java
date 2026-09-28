@@ -13,10 +13,7 @@ import uhc.tensuraUHC.roles.Role;
 import uhc.tensuraUHC.scenarios.Scenario;
 import uhc.tensuraUHC.scenarios.list.MasterLevelScenario;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameManager {
 
@@ -37,9 +34,9 @@ public class GameManager {
             alivePlayer = Bukkit.getOnlinePlayers().size();
         }
         else {
-            for (Player player : GetactivePlayers())
+            for (UUID player : GetactivePlayers())
             {
-                if (main.getRoleManager().hasRole(player))
+                if (main.getRoleManager().hasRole(Bukkit.getPlayer(player)))
                 {
                     alivePlayer++;
                 }
@@ -47,12 +44,12 @@ public class GameManager {
         }
         return alivePlayer;
     }
-    List<Player> activePlayers = new ArrayList<>();
-    private void SetActivePlayers(List<Player> players)
+    List<UUID> activePlayers = new ArrayList<>();
+    private void SetActivePlayers(List<UUID> players)
     {
         activePlayers = players;
     }
-    List<Player> GetactivePlayers()
+    List<UUID> GetactivePlayers()
     {
         return activePlayers;
     }
@@ -128,11 +125,11 @@ public class GameManager {
 
     private void startLoop() {
         if (gameTask != null) gameTask.cancel();
+        activePlayers.clear();
 
-        SetActivePlayers(activePlayers);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.CREATIVE) {
-                activePlayers.add(player);
+                activePlayers.add(player.getUniqueId());
             }
         }
         gameTask = new BukkitRunnable() {

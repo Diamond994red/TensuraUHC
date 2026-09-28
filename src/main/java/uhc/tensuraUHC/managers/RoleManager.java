@@ -45,7 +45,7 @@ public class RoleManager {
     /**
      * Distribue aléatoirement les rôles configurés aux joueurs.
      */
-    public void distributeRoles(List<Player> players) {
+    public void distributeRoles(List<UUID> players) {
         if (players.isEmpty() || roles.isEmpty()) return;
 
         // 1. Construit le pool de rôles actifs selon le nombre d'exemplaires défini
@@ -70,15 +70,15 @@ public class RoleManager {
         for (int i = 0; i < players.size(); i++) {
             // Reboucle sur la liste si le nombre de joueurs est supérieur au nombre de rôles configurés
             Role roleToGive = activePool.get(i % activePool.size());
-            assignRole(players.get(i), roleToGive);
-            currentPlayerRoles.put(players.get(i).getUniqueId(), roleToGive);
+            assignRole(Bukkit.getPlayer(players.get(i)), roleToGive);
+            currentPlayerRoles.put(players.get(i), roleToGive);
             if (roleToGive instanceof YuukiRole)
             {
-                players.get(i).setMaxHealth(26.0);
+                Bukkit.getPlayer(players.get(i)).setMaxHealth(26.0);
             }
             else
             {
-                players.get(i).setMaxHealth(20.0);
+                Bukkit.getPlayer(players.get(i)).setMaxHealth(20.0);
             }
         }
     }
