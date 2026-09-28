@@ -71,8 +71,8 @@ public class PlayerCommand implements CommandExecutor {
         }
 
         // ==========================================
-        // COMMANDE /HELPOP
-        // ==========================================
+// COMMANDE /HELPOP
+// ==========================================
         if (cmd.equalsIgnoreCase("helpop")) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage("Seul un joueur peut exécuter cette commande.");
@@ -90,12 +90,18 @@ public class PlayerCommand implements CommandExecutor {
             for (String arg : args) {
                 message.append(arg).append(" ");
             }
-            player.sendMessage(ChatColor.DARK_BLUE + "[HELPOP]" + ChatColor.BLUE + " Le message a bien été envoyé à l'host.");
 
+            // Création du ticket numéroté
+            int ticketId = main.getHelpOpManager().createTicket(player);
+
+            player.sendMessage(ChatColor.DARK_BLUE + "[HELPOP #" + ticketId + "]" + ChatColor.BLUE + " Le message a bien été envoyé à l'host.");
+
+            // Notification aux Hosts avec le numéro du ticket
             for (Player pHost : main.getServer().getOnlinePlayers()) {
                 if (main.isHostOrCoHost(pHost)) {
-                    pHost.sendMessage(ChatColor.AQUA + "Anonyme : " + ChatColor.BLUE + message.toString().trim());
-                    return true;
+                    pHost.sendMessage(ChatColor.DARK_BLUE + "[HELPOP #" + ticketId + "] "
+                            + ChatColor.AQUA + player.getName() + " : "
+                            + ChatColor.BLUE + message.toString().trim());
                 }
             }
             return true;

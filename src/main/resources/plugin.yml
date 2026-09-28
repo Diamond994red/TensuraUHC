@@ -37,3 +37,6 @@ commands:
   testdeath:
       description: Ajoute une position de mort fictive sous Limule pour tester Prédateur.
       permission: tensurauhc.admin
+  reply:
+    description: Répondre à un HelpOp par son numéro
+    aliases: [ rhelpop ]

@@ -30,6 +30,7 @@ public class TensuraUHC extends JavaPlugin {
     private ScoreboardManager scoreboardManager;
     private RoleManager roleManager;
     private ScenarioManager scenarioManager;
+    private HelpOpManager helpOpManager;
     // --- Variables de Configuration ---
     private String gameName = "Tensura UHC";
     private int episodeLengthSeconds = 1200; // 20 minutes par défaut
@@ -65,6 +66,7 @@ public class TensuraUHC extends JavaPlugin {
         this.scoreboardManager = new ScoreboardManager(this);
         this.roleManager = new RoleManager(this);
         this.scenarioManager = new ScenarioManager(this);
+        this.helpOpManager = new HelpOpManager(this);
         CraftManager craftManager = new CraftManager(this);
         craftManager.registerCrafts();
         // 2. Enregistrement des Listeners
@@ -230,6 +232,7 @@ public class TensuraUHC extends JavaPlugin {
     public WorldManager getWorldManager() { return worldManager; }
     public ScoreboardManager getScoreboardManager() { return scoreboardManager; }
     public RoleManager getRoleManager() { return roleManager; }
+    public HelpOpManager getHelpOpManager() {return helpOpManager; }
 
     public String getGameName() { return gameName; }
     public void setGameName(String gameName) { this.gameName = gameName; }

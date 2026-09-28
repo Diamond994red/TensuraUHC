@@ -1,5 +1,6 @@
 package uhc.tensuraUHC.roles.list.SoloCamp;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -16,6 +17,8 @@ import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.powers.IfritPower;
 import uhc.tensuraUHC.roles.Role;
+
+import java.util.UUID;
 
 public class ShizuRole extends Role {
     private BukkitTask proximityTask;
@@ -91,7 +94,8 @@ public class ShizuRole extends Role {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
-        if (main.getRoleManager().hasRole(victim, this)) return; {
+        if (main.getRoleManager().hasRole(victim, this)) return;
+        {
             ifritPower.reset(victim);
         }
     }
@@ -100,52 +104,64 @@ public class ShizuRole extends Role {
     public void reset(Player player) {
         super.reset(player);
         ifritPower.reset(player);
-        if (proximityTask != null) { proximityTask.cancel(); proximityTask = null; }
+        if (proximityTask != null) {
+            proximityTask.cancel();
+            proximityTask = null;
+        }
     }
 
-    private void startProximityCheck(Player player) {
+    private void startProximityCheck(Player initialPlayer) {
+        UUID playerUUID = initialPlayer.getUniqueId(); // Stocker l'UUID
+
         proximityTask = new BukkitRunnable() {
             int limuleTime = 0;
             int CurrentLimuleTime = 0;
             boolean campChanged = false;
+
             @Override
             public void run() {
-                if (!player.isOnline()) return;
+                Player player = Bukkit.getPlayer(playerUUID);
+                if (player == null || !player.isOnline()) return;
+
                 if (!campChanged) {
                     for (Player nearby : player.getWorld().getPlayers()) {
-                        if (nearby.equals(player) || nearby.getLocation().distance(player.getLocation()) > 15) continue;
+                        if (nearby.equals(player)) continue;
+
+                        if (!nearby.getWorld().equals(player.getWorld())) continue;
+
+                        if (nearby.getLocation().distance(player.getLocation()) > 15) continue;
 
                         Role nearbyRole = main.getRoleManager().getPlayerRole(nearby);
                         if (nearbyRole == null) continue;
-                        String roleName = nearbyRole.getName();
-                        if (roleName.equals("Limule")) {
+
+                        if (nearbyRole.getName().equals("Limule")) {
                             limuleTime++;
                             CurrentLimuleTime++;
-                            if (limuleTime == 60 * 15) {
+                            if (limuleTime >= 60 * 15) { // remettre à 15 * 60
                                 if (nearbyRole.getCamp() == Camp.LIMULE) {
                                     setCamp(Camp.LIMULE);
                                     for (Player pl : player.getWorld().getPlayers()) {
-                                        if (main.getRoleManager().getPlayerRole(pl).getCamp() == Camp.LIMULE) {
-                                            pl.sendMessage(ChatColor.GOLD + "Shizue" + ChatColor.GREEN + " est devenue vôtre coéquipière !");
+                                        Role plRole = main.getRoleManager().getPlayerRole(pl);
+                                        if (plRole != null && plRole.getCamp() == Camp.LIMULE) {
+                                            pl.sendMessage(ChatColor.GOLD + "Shizue" + ChatColor.GREEN + " est devenue votre coéquipière !");
                                         }
                                     }
                                     player.sendMessage(ChatColor.GREEN + "Vous n'êtes plus seule...");
                                     campChanged = true;
                                 } else if (nearbyRole.getCamp() == Camp.MONSTRES) {
                                     setCamp(Camp.SHIZUE);
-                                    nearby.sendMessage(ChatColor.GOLD + "Shizue" + ChatColor.GREEN + " est devenue vôtre seule coéquipière !");
+                                    nearby.sendMessage(ChatColor.GOLD + "Shizue" + ChatColor.GREEN + " est devenue votre seule coéquipière !");
                                     player.sendMessage(ChatColor.GREEN + "Vous n'êtes plus seule...");
+                                    nearbyRole.setCamp(Camp.SHIZUE);
                                     campChanged = true;
                                 }
                             }
                         }
                     }
-
-                    if (main.getGameManager().IsNewEp())
-                    {
-                        player.sendMessage(ChatColor.GREEN + "Vous êtes restée " + formatTime(CurrentLimuleTime) + " avec Limule cet épisode.");
-                        CurrentLimuleTime = 0;
-                    }
+                }
+                if (main.getGameManager().IsNewEp()) {
+                    player.sendMessage(ChatColor.GREEN + "Vous êtes restée " + formatTime(CurrentLimuleTime) + " avec Limule cet épisode.");
+                    CurrentLimuleTime = 0;
                 }
             }
         }.runTaskTimer(main, 0L, 20L);

@@ -27,18 +27,35 @@ public class GameManager {
     private int totalGameSeconds = 0;
     private boolean pvpActive = false;
     private boolean roleRevealed = false;
-    private int alivePlayer = 0;
     private boolean newEp = false;
     public void SetRolesRevealed(boolean b) { this.roleRevealed = b; }
     public boolean GetRolesRevealed() { return roleRevealed; }
     public int GetTotalGameSeconds() { return totalGameSeconds; }
     public int GetTotalAlivePlayers() {
+        int alivePlayer = 0;
         if (!GetRolesRevealed()) {
             alivePlayer = Bukkit.getOnlinePlayers().size();
         }
+        else {
+            for (Player player : GetactivePlayers())
+            {
+                if (main.getRoleManager().hasRole(player))
+                {
+                    alivePlayer++;
+                }
+            }
+        }
         return alivePlayer;
     }
-
+    List<Player> activePlayers = new ArrayList<>();
+    private void SetActivePlayers(List<Player> players)
+    {
+        activePlayers = players;
+    }
+    List<Player> GetactivePlayers()
+    {
+        return activePlayers;
+    }
     public GameManager(TensuraUHC main) {
         this.main = main;
     }
@@ -66,6 +83,7 @@ public class GameManager {
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.getInventory().clear();
             p.setGameMode(GameMode.SURVIVAL);
+            p.setMaxHealth(20.0);
             p.setHealth(20.0);
             p.setFoodLevel(20);
 
@@ -110,8 +128,8 @@ public class GameManager {
 
     private void startLoop() {
         if (gameTask != null) gameTask.cancel();
-        List<Player> activePlayers = new ArrayList<>();
 
+        SetActivePlayers(activePlayers);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.CREATIVE) {
                 activePlayers.add(player);
@@ -124,13 +142,12 @@ public class GameManager {
                     cancel();
                     return;
                 }
-                if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
-                {
-                    WinGame(main.getRoleManager().FinalCamp());
-                }
+                //if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
+                //{
+                //    WinGame(main.getRoleManager().FinalCamp());
+                //}
                 secondsInEpisode++;
                 totalGameSeconds++;
-                newEp = false;
                 if (totalGameSeconds == 60) {
                     main.getNoDamagePlayers().clear();
                     Bukkit.broadcastMessage(ChatColor.RED + "[TensuraUHC] Les dégâts sont désormais ACTIFS !");
@@ -146,6 +163,9 @@ public class GameManager {
                         player.setHealth(player.getMaxHealth());
                     }
                     Bukkit.broadcastMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.GREEN + "Final Heal ! Tous les joueurs ont été soignés !");
+                }
+                if (newEp) {
+                    newEp = false;
                 }
 
                 if (totalGameSeconds == main.GetRoleTime()) {
@@ -202,6 +222,7 @@ public class GameManager {
 
         // Vide complètement les rôles assignés
         main.getRoleManager().getPlayerRoles().clear();
+        main.getRoleManager().getcurrentPlayerRoles().clear();
 
         main.setGameStarted(false);
         Bukkit.broadcastMessage(ChatColor.RED + "[TensuraUHC] La partie et tous les pouvoirs ont été réinitialisés.");

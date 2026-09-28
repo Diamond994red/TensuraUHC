@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import uhc.tensuraUHC.TensuraUHC;
 
+import java.util.UUID;
+
 public class HostCommand implements CommandExecutor {
 
     private final TensuraUHC main;
@@ -95,6 +97,59 @@ public class HostCommand implements CommandExecutor {
             }
             return true;
         }
+        // ==========================================
+// COMMANDE /REPLY <id> <message> ou /RHELPOP
+// ==========================================
+        if (label.equalsIgnoreCase("reply") || label.equalsIgnoreCase("rhelpop")) {
+            if (sender instanceof Player) {
+                Player player = (Player) sender;
+                if (!main.isHostOrCoHost(player)) {
+                    player.sendMessage(ChatColor.RED + "Seuls les Hosts et Co-Hosts peuvent utiliser cette commande.");
+                    return true;
+                }
+            }
+
+            if (args.length < 2) {
+                sender.sendMessage(ChatColor.RED + "Utilisation : /" + label + " <numéro> <message>");
+                return true;
+            }
+
+            try {
+                int ticketId = Integer.parseInt(args[0]);
+                UUID targetUUID = main.getHelpOpManager().getSenderUUID(ticketId);
+
+                if (targetUUID == null) {
+                    sender.sendMessage(ChatColor.RED + "Aucun ticket d'aide trouvé avec le numéro #" + ticketId);
+                    return true;
+                }
+
+                Player target = Bukkit.getPlayer(targetUUID);
+                if (target == null || !target.isOnline()) {
+                    sender.sendMessage(ChatColor.RED + "Le joueur ayant ouvert le ticket #" + ticketId + " n'est plus en ligne.");
+                    return true;
+                }
+
+                // Assemblage du message de réponse
+                StringBuilder response = new StringBuilder();
+                for (int i = 1; i < args.length; i++) {
+                    response.append(args[i]).append(" ");
+                }
+
+                String senderName = (sender instanceof Player) ? sender.getName() : "Console";
+
+                // Message au joueur
+                target.sendMessage(ChatColor.DARK_BLUE + "[HELPOP #" + ticketId + "] "
+                        + ChatColor.GOLD + senderName + " (Host) : "
+                        + ChatColor.YELLOW + response.toString().trim());
+
+                // Confirmation à l'Host
+                sender.sendMessage(ChatColor.GREEN + "Réponse envoyée au ticket #" + ticketId + " (" + target.getName() + ").");
+
+            } catch (NumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "Le numéro de ticket doit être un entier valide.");
+            }
+            return true;
+        }
 
         // ==========================================
         // 3. COMMANDE /REVIVE <joueur>
@@ -125,6 +180,7 @@ public class HostCommand implements CommandExecutor {
             }
 
             // Remet le joueur en SURVIVAL et le téléporte sur la carte UHC
+            main.getRoleManager().assignRole(target, main.getRoleManager().getcurrentPlayerRoles().get(target.getUniqueId()));
             target.setGameMode(GameMode.SURVIVAL);
             int y = main.getGameWorld().getHighestBlockYAt(0, 0) + 2;
             target.teleport(new Location(main.getGameWorld(), 0, y, 0));

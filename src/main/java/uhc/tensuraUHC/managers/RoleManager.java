@@ -17,6 +17,7 @@ public class RoleManager {
     private final TensuraUHC main;
     private final List<Role> roles = new ArrayList<>();
     private final Map<UUID, Role> playerRoles = new HashMap<>();
+    private final Map<UUID, Role> currentPlayerRoles = new HashMap<>();
 
     public RoleManager(TensuraUHC main) {
         this.main = main;
@@ -70,6 +71,7 @@ public class RoleManager {
             // Reboucle sur la liste si le nombre de joueurs est supérieur au nombre de rôles configurés
             Role roleToGive = activePool.get(i % activePool.size());
             assignRole(players.get(i), roleToGive);
+            currentPlayerRoles.put(players.get(i).getUniqueId(), roleToGive);
             if (roleToGive instanceof YuukiRole)
             {
                 players.get(i).setMaxHealth(26.0);
@@ -104,22 +106,35 @@ public class RoleManager {
     }
 
     public int getAliveCampsCount(List<Player> players) {
-        Set<Role.Camp> aliveCamps = new HashSet<>();
+        int aliveCampsCount = 0;
 
         for (Player player : players) {
             if (player != null && player.isOnline() && !player.isDead()) {
                 Role role = main.getRoleManager().getPlayerRole(player);
-                if (role != null && role.getCamp() != null) {
-                    aliveCamps.add(role.getCamp());
+                if (role != null && role.getCamp() != null && role.getCamp() != Role.Camp.SOLITAIRE) {
+                    aliveCampsCount++;
                 }
             }
         }
-        return aliveCamps.size();
+        for (Player player : players) {
+            if (player != null && player.isOnline() && !player.isDead()) {
+                Role role = main.getRoleManager().getPlayerRole(player);
+                if (role != null && role.getCamp() == Role.Camp.SOLITAIRE) {
+                    aliveCampsCount++;
+                }
+            }
+        }
+
+        return aliveCampsCount;
     }
 
     public boolean hasRole(Player player, Role role) {
         Role currentRole = getPlayerRole(player);
         return currentRole != null && currentRole.equals(role);
+    }
+    public boolean hasRole(Player player)
+    {
+        return getPlayerRole(player) != null;
     }
 
     public String getCampMessage(Role.Camp camp, Map<Role.Camp, String> messages) {
@@ -156,5 +171,9 @@ public class RoleManager {
             }
         }
         return aliveCamp;
+    }
+
+    public Map<UUID, Role> getcurrentPlayerRoles() {
+        return currentPlayerRoles;
     }
 }

@@ -36,7 +36,11 @@ public class DeathListener implements Listener {
 
         // 2. MODIFICATIONS SYNCHRONES (Immédiates pendant l'event)
         if (rolesRevealed) {
-            event.setDeathMessage("================-================\n    " + victim.getName() + " est mort. Il était " + main.getRoleManager().getPlayerRole(victim).getCamp().getColor() + main.getRoleManager().getPlayerRole(victim).getName() + ".\n=================================");
+            event.setDeathMessage("================-================\n    " +
+                    victim.getName() + " est mort. Il était " +
+                    main.getRoleManager().getPlayerRole(victim).getCamp().getColor() +
+                    main.getRoleManager().getPlayerRole(victim).getName() + ChatColor.WHITE +
+                    ".\n=================================");
 
             // On fait spawner la gapple directement au sol à la position de la mort
             if (deathLocation.getWorld() != null) {
