@@ -99,7 +99,7 @@ public class EnchantRestrictionListener implements Listener {
     private int getMaxAllowed(Player player, Material mat, Enchantment ench) {
         // 1. Vérification si le rôle du joueur possède un dépassement spécifique
         if (player != null && main.getRoleManager() != null) {
-            Role role = main.getRoleManager().getPlayerRole(player);
+            Role role = main.getRoleManager().getPlayerRole(player.getUniqueId());
             if (role != null && role.getEnchantBypasses().containsKey(ench)) {
                 return role.getEnchantBypasses().get(ench);
             }

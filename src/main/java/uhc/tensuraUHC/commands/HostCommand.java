@@ -143,7 +143,7 @@ public class HostCommand implements CommandExecutor {
                         + ChatColor.YELLOW + response.toString().trim());
 
                 // Confirmation à l'Host
-                sender.sendMessage(ChatColor.GREEN + "Réponse envoyée au ticket #" + ticketId + " (" + target.getName() + ").");
+                sender.sendMessage(ChatColor.GREEN + "Réponse envoyée au ticket #" + ticketId + ".");
 
             } catch (NumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "Le numéro de ticket doit être un entier valide.");

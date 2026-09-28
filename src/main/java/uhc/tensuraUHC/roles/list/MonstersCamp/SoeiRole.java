@@ -70,7 +70,7 @@ public class SoeiRole extends Role {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
-        if (!main.getRoleManager().hasRole(player, this)) return;
+        if (!main.getRoleManager().hasRole(player.getUniqueId(), this)) return;
 
         ItemStack item = event.getItemInHand();
         if (item == null || item.getType() != Material.STRING || !item.hasItemMeta()) return;
@@ -107,7 +107,7 @@ public class SoeiRole extends Role {
                                 trap.usesLeft--;
 
                                 // Récupération des informations du joueur
-                                Role targetRole = main.getRoleManager().getPlayerRole(target);
+                                Role targetRole = main.getRoleManager().getPlayerRole(target.getUniqueId());
                                 String roleName = (targetRole != null) ? targetRole.getName() : "Aucun";
                                 String campName = (targetRole != null && targetRole.getCamp() != null) ? targetRole.getCamp().name() : "Inconnu";
 

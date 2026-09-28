@@ -186,7 +186,7 @@ public class LimuleRole extends Role {
         deathLocations.put(victim.getLocation(), System.currentTimeMillis());
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Role playerRole = main.getRoleManager().getPlayerRole(player);
+            Role playerRole = main.getRoleManager().getPlayerRole(player.getUniqueId());
             if (playerRole != null && playerRole.getClass().equals(this.getClass())) {
                 boolean sendX = new Random().nextBoolean();
                 int coordinate = sendX ? victim.getLocation().getBlockX() : victim.getLocation().getBlockZ();
@@ -201,7 +201,7 @@ public class LimuleRole extends Role {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!main.getRoleManager().hasRole(player, this)) return;
+        if (!main.getRoleManager().hasRole(player.getUniqueId(), this)) return;
 
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
@@ -333,7 +333,7 @@ public class LimuleRole extends Role {
                 for (Player nearby : player.getWorld().getPlayers()) {
                     if (nearby.equals(player) || nearby.getLocation().distance(player.getLocation()) > 15) continue;
 
-                    Role nearbyRole = main.getRoleManager().getPlayerRole(nearby);
+                    Role nearbyRole = main.getRoleManager().getPlayerRole(nearby.getUniqueId());
                     if (nearbyRole == null) continue;
 
                     String roleName = nearbyRole.getName();
@@ -373,7 +373,7 @@ public class LimuleRole extends Role {
         ItemStack currentItem = event.getCurrentItem();
         if (currentItem == null || !currentItem.hasItemMeta()) return;
 
-        Role role = main.getRoleManager().getPlayerRole(player);
+        Role role = main.getRoleManager().getPlayerRole(player.getUniqueId());
         if (!(role instanceof LimuleRole)) return;
 
         LimuleRole limuleRole = (LimuleRole) role;

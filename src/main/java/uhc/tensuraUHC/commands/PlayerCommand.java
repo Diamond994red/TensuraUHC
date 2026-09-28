@@ -92,15 +92,15 @@ public class PlayerCommand implements CommandExecutor {
             }
 
             // Création du ticket numéroté
-            int ticketId = main.getHelpOpManager().createTicket(player);
+            int ticketId = main.getHelpOpManager().createTicket(player.getUniqueId());
 
-            player.sendMessage(ChatColor.DARK_BLUE + "[HELPOP #" + ticketId + "]" + ChatColor.BLUE + " Le message a bien été envoyé à l'host.");
+            player.sendMessage(ChatColor.DARK_BLUE + "[HELPOP]" + ChatColor.BLUE + " Le message a bien été envoyé à l'host.");
 
             // Notification aux Hosts avec le numéro du ticket
             for (Player pHost : main.getServer().getOnlinePlayers()) {
                 if (main.isHostOrCoHost(pHost)) {
                     pHost.sendMessage(ChatColor.DARK_BLUE + "[HELPOP #" + ticketId + "] "
-                            + ChatColor.AQUA + player.getName() + " : "
+                            + ChatColor.AQUA + "Anonyme : "
                             + ChatColor.BLUE + message.toString().trim());
                 }
             }

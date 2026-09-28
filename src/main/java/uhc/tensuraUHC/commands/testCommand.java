@@ -25,7 +25,7 @@ public class testCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        Role role = main.getRoleManager().getPlayerRole(player);
+        Role role = main.getRoleManager().getPlayerRole(player.getUniqueId());
 
         if (!(role instanceof LimuleRole)) {
             player.sendMessage(ChatColor.RED + "Seul Limule peut exécuter cette commande de test !");

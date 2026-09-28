@@ -20,9 +20,9 @@ public class HelpOpManager {
     // Associe l'ID du ticket à l'UUID de l'émetteur
     private final Map<Integer, UUID> ticketSenders = new HashMap<>();
 
-    public int createTicket(Player sender) {
+    public int createTicket(UUID sender) {
         int id = nextTicketId++;
-        ticketSenders.put(id, sender.getUniqueId());
+        ticketSenders.put(id, sender);
         return id;
     }
 

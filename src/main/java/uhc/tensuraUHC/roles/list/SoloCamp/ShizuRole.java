@@ -79,7 +79,7 @@ public class ShizuRole extends Role {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!main.getRoleManager().hasRole(player, this)) return;
+        if (!main.getRoleManager().hasRole(player.getUniqueId(), this)) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         ItemStack item = event.getItem();
@@ -94,7 +94,7 @@ public class ShizuRole extends Role {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         Player victim = event.getEntity();
-        if (main.getRoleManager().hasRole(victim, this)) return;
+        if (main.getRoleManager().hasRole(victim.getUniqueId(), this)) return;
         {
             ifritPower.reset(victim);
         }
@@ -131,17 +131,17 @@ public class ShizuRole extends Role {
 
                         if (nearby.getLocation().distance(player.getLocation()) > 15) continue;
 
-                        Role nearbyRole = main.getRoleManager().getPlayerRole(nearby);
+                        Role nearbyRole = main.getRoleManager().getPlayerRole(nearby.getUniqueId());
                         if (nearbyRole == null) continue;
 
                         if (nearbyRole.getName().equals("Limule")) {
                             limuleTime++;
                             CurrentLimuleTime++;
-                            if (limuleTime >= 60 * 15) { // remettre à 15 * 60
+                            if (limuleTime >= 60 * 2) { // remettre à 15 * 60
                                 if (nearbyRole.getCamp() == Camp.LIMULE) {
                                     setCamp(Camp.LIMULE);
                                     for (Player pl : player.getWorld().getPlayers()) {
-                                        Role plRole = main.getRoleManager().getPlayerRole(pl);
+                                        Role plRole = main.getRoleManager().getPlayerRole(pl.getUniqueId());
                                         if (plRole != null && plRole.getCamp() == Camp.LIMULE) {
                                             pl.sendMessage(ChatColor.GOLD + "Shizue" + ChatColor.GREEN + " est devenue votre coéquipière !");
                                         }

@@ -331,13 +331,16 @@ public class InventoryListener implements Listener {
 
             // Appliquer la couleur à tous les joueurs sélectionnés
             for (Player target : targets) {
-                String teamName = "c_" + target.getName();
-                Team team = personalBoard.getTeam(teamName);
+                String name = target.getName();
+                String safeName = name.length() > 14 ? name.substring(0, 14) : name;
+                String teamName = "c_" + safeName;
 
+                Team team = personalBoard.getTeam(teamName);
                 if (team == null) {
                     team = personalBoard.registerNewTeam(teamName);
                 }
-
+                team.setCanSeeFriendlyInvisibles(false);
+// On ajoute bien le VRAI nom du joueur dans la team (pas le nom raccourci)
                 team.addEntry(target.getName());
                 team.setPrefix(color != null ? color.toString() : "");
             }
@@ -876,7 +879,7 @@ public class InventoryListener implements Listener {
 
             if (currentItem == null || !currentItem.hasItemMeta() || !currentItem.getItemMeta().hasDisplayName()) return;
 
-            Role playerRole = main.getRoleManager().getPlayerRole(player);
+            Role playerRole = main.getRoleManager().getPlayerRole(player.getUniqueId());
             if (!(playerRole instanceof YuukiRole)) {
                 player.closeInventory();
                 return;

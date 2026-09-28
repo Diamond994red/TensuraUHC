@@ -132,17 +132,20 @@ public class ItemRestrictionListener implements Listener {
             if (eligible && !hasArmor) {
                 event.setCancelled(true);
 
-                if (item.getAmount() > 1) {
-                    item.setAmount(item.getAmount() - 1);
+                // Retirer 1 item correctement du stack dans la main du joueur
+                ItemStack inHand = player.getItemInHand();
+                if (inHand != null && inHand.getAmount() > 1) {
+                    inHand.setAmount(inHand.getAmount() - 1);
+                    player.setItemInHand(inHand);
                 } else {
-                    // Selon le slot utilisé
-                    if (player.getItemInHand().equals(item)) {
-                        player.setItemInHand(null);
-                    }
+                    player.setItemInHand(null);
                 }
+
+                player.updateInventory();
 
                 player.setFoodLevel(Math.min(20, player.getFoodLevel() + 4));
                 player.setSaturation(Math.min(player.getFoodLevel(), player.getSaturation() + 9.6f));
+
                 Bukkit.getScheduler().runTask(main, () -> {
                     player.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 120 * 20, 0, false, false));
                     player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 5 * 20, 1, false, false));

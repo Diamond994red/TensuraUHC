@@ -10,6 +10,7 @@ import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class DeathListener implements Listener {
 
@@ -21,14 +22,16 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        Player victim = event.getEntity();
-        Player killer = victim.getKiller();
+        Player victimPlayer = event.getEntity();
+        UUID victim = victimPlayer.getUniqueId();
 
-        if (killer != null) {
-            main.getKills().put(killer.getUniqueId(), main.getKills().getOrDefault(killer.getUniqueId(), 0) + 1);
+        // Gestion du killer avec vérification null-safe
+        if (victimPlayer.getKiller() != null) {
+            UUID killer = victimPlayer.getKiller().getUniqueId();
+            main.getKills().put(killer, main.getKills().getOrDefault(killer, 0) + 1);
         }
 
-        Location deathLocation = victim.getLocation();
+        Location deathLocation = victimPlayer.getLocation();
 
         // 1. Vérification stricte
         boolean rolesRevealed = (main.getGameManager() != null && main.getGameManager().GetRolesRevealed())
@@ -36,44 +39,54 @@ public class DeathListener implements Listener {
 
         // 2. MODIFICATIONS SYNCHRONES (Immédiates pendant l'event)
         if (rolesRevealed) {
+            Role victimRole = main.getRoleManager().getPlayerRole(victim);
+
+            String roleName = (victimRole != null) ? victimRole.getName() : "Inconnu";
+            String campColor = (victimRole != null && victimRole.getCamp() != null) ? victimRole.getCamp().getColor().toString() : ChatColor.GRAY.toString();
+
             event.setDeathMessage("================-================\n    " +
-                    victim.getName() + " est mort. Il était " +
-                    main.getRoleManager().getPlayerRole(victim).getCamp().getColor() +
-                    main.getRoleManager().getPlayerRole(victim).getName() + ChatColor.WHITE +
+                    victimPlayer.getName() + " est mort. Il était " +
+                    campColor + roleName + ChatColor.WHITE +
                     ".\n=================================");
 
-            // On fait spawner la gapple directement au sol à la position de la mort
+            // Drop de la Gapple
             if (deathLocation.getWorld() != null) {
                 deathLocation.getWorld().dropItemNaturally(deathLocation, new ItemStack(Material.GOLDEN_APPLE, 1));
             }
+
             main.getRoleManager().removeRole(victim);
+            main.getGameManager().DeleteActivePlayer(victim);
         }
 
-        // 3. ACTIONS DIFFÉRÉES (Respawn & Téléportation au tick suivant)
+        // 3. ACTIONS DIFFÉRÉES (Respawn & Téléportation au tick suivant avec UUID)
         Bukkit.getScheduler().runTask(main, () -> {
-            // Forcer le respawn instantané
-            victim.spigot().respawn();
+            Player p = Bukkit.getPlayer(victim);
+            if (p == null || !p.isOnline()) return;
+
+            // Force le respawn instantané via l'objet Player récupéré
+            p.spigot().respawn();
 
             if (!rolesRevealed) {
                 // --- CAS : Rôles NON annoncés -> Respawn Survie ---
                 World gameWorld = main.getGameWorld();
                 if (gameWorld == null) {
-                    gameWorld = Bukkit.getWorld("uhc_world") != null ? Bukkit.getWorld("uhc_world") : victim.getWorld();
+                    gameWorld = Bukkit.getWorld("uhc_world") != null ? Bukkit.getWorld("uhc_world") : p.getWorld();
                 }
 
                 Location randomLoc = getRandomRespawnLocation(gameWorld, 0, main.getBorderManager().getCurrentBorderRadius(gameWorld));
 
-                victim.setGameMode(GameMode.SURVIVAL);
-                victim.setHealth(victim.getMaxHealth());
-                victim.setFoodLevel(20);
-                victim.teleport(randomLoc);
+                p.setGameMode(GameMode.SURVIVAL);
+                p.setHealth(p.getMaxHealth());
+                p.setFoodLevel(20);
+                p.setSaturation(5.0f);
+                p.teleport(randomLoc);
 
-                victim.sendMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.YELLOW + "Les rôles ne sont pas encore annoncés ! Vous avez réapparu à un endroit distant.");
+                p.sendMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.YELLOW + "Les rôles ne sont pas encore annoncés ! Vous avez réapparu à un endroit distant.");
             } else {
                 // --- CAS : Rôles DÉJÀ annoncés -> Spectateur ---
-                victim.setGameMode(GameMode.SPECTATOR);
-                victim.teleport(deathLocation);
-                victim.sendMessage(ChatColor.RED + "[TensuraUHC] Vous êtes mort ! Vous êtes désormais en mode spectateur.");
+                p.setGameMode(GameMode.SPECTATOR);
+                p.teleport(deathLocation);
+                p.sendMessage(ChatColor.RED + "[TensuraUHC] Vous êtes mort ! Vous êtes désormais en mode spectateur.");
             }
         });
     }

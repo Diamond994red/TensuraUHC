@@ -101,6 +101,8 @@ public class TensuraUHC extends JavaPlugin {
         getCommand("rule").setExecutor(playerCommand);
         getCommand("tr").setExecutor(new TensuraCommand(this));
         getCommand("testdeath").setExecutor(new testCommand(this));
+        getCommand("reply").setExecutor(new HostCommand(this));
+        getCommand("rhelpop").setExecutor(new HostCommand(this));
 
         saveDefaultConfig();
         loadConfiguration();

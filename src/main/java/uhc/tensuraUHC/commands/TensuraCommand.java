@@ -37,7 +37,7 @@ public class TensuraCommand implements CommandExecutor {
         }
 
         String subCommand = args[0].toLowerCase();
-        Role playerRole = main.getRoleManager().getPlayerRole(player);
+        Role playerRole = main.getRoleManager().getPlayerRole(player.getUniqueId());
 
 
         switch (subCommand) {
@@ -99,7 +99,7 @@ public class TensuraCommand implements CommandExecutor {
             return;
         }
 
-        Role role = main.getRoleManager().getPlayerRole(player);
+        Role role = main.getRoleManager().getPlayerRole(player.getUniqueId());
 
         if (role == null) {
             player.sendMessage(ChatColor.RED + "Vous n'avez aucun rôle attribué.");
@@ -111,7 +111,7 @@ public class TensuraCommand implements CommandExecutor {
     }
     // --- /tr choisir <nomDuRole> ---
     private void handleChoisirCommand(Player player, String[] args) {
-        Role playerRole = main.getRoleManager().getPlayerRole(player);
+        Role playerRole = main.getRoleManager().getPlayerRole(player.getUniqueId());
 
         if (!(playerRole instanceof YuukiRole)) {
             player.sendMessage(ChatColor.RED + "Vous ne pouvez pas exécuter cette commande.");
@@ -131,7 +131,7 @@ public class TensuraCommand implements CommandExecutor {
 
     // --- /tr claim ---
     private void handleClaimCommand(Player player) {
-        Role playerRole = main.getRoleManager().getPlayerRole(player);
+        Role playerRole = main.getRoleManager().getPlayerRole(player.getUniqueId());
 
         if (!(playerRole instanceof YuukiRole)) {
             player.sendMessage(ChatColor.RED + "Vous ne pouvez pas exécuter cette commande.");

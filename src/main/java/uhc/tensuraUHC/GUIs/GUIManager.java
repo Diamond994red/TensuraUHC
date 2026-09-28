@@ -711,15 +711,16 @@ public class GUIManager {
         Inventory gui = Bukkit.createInventory(null, 54, ChatColor.DARK_GRAY + "Sélectionner un joueur");
 
         int slot = 0;
-        for (Player p : Bukkit.getOnlinePlayers()) {
+        for (UUID p : main.getGameManager().GetActivePlayers()) {
+            Player pl = Bukkit.getPlayer(p);
             // Filtre : uniquement les joueurs ayant un rôle attribué via le RoleManager
             if (main.getRoleManager().getPlayerRole(p) != null) {
                 ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) 3); // 3 = Tête de joueur
                 SkullMeta meta = (SkullMeta) skull.getItemMeta();
 
                 if (meta != null) {
-                    meta.setOwner(p.getName());
-                    meta.setDisplayName(ChatColor.YELLOW + p.getName());
+                    meta.setOwner(pl.getName());
+                    meta.setDisplayName(ChatColor.YELLOW + pl.getName());
 
                     List<String> lore = new ArrayList<>();
                     lore.add(ChatColor.GRAY + "Clic pour choisir la couleur de ce joueur.");

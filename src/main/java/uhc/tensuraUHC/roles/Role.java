@@ -10,10 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import uhc.tensuraUHC.TensuraUHC;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class Role implements Listener {
 
@@ -167,14 +164,16 @@ public abstract class Role implements Listener {
         int seconds = totalSeconds % 60;
         return (seconds > 0) ? String.format("%d min %d s", minutes, seconds) : minutes + " min";
     }
-    public void reset(Player player) {
-        if (player != null && player.isOnline()) {
-            player.setMaxHealth(20.0);
-            player.setHealth(Math.min(player.getHealth(), 20.0));
+    public void reset(UUID player) {
+        Player pl = Bukkit.getPlayer(player);
+        if (pl != null && pl.isOnline()) {
+            pl.setMaxHealth(20.0);
+            pl.setHealth(Math.min(pl.getHealth(), 20.0));
             for (PotionEffect effect : passiveEffects) {
-                player.removePotionEffect(effect.getType());
+                pl.removePotionEffect(effect.getType());
             }
         }
+        camp = initialCamp;
     }
 
     public void GetRoleDescription(Player player) {

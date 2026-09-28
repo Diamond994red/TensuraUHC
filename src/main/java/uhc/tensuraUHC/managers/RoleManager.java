@@ -4,10 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
-import uhc.tensuraUHC.roles.list.ClownsCamp.*;
-import uhc.tensuraUHC.roles.list.HumansCamp.*;
+import uhc.tensuraUHC.roles.list.HumansCamp.RudraRole;
 import uhc.tensuraUHC.roles.list.MonstersCamp.*;
-import uhc.tensuraUHC.roles.list.OctagramCamp.*;
 import uhc.tensuraUHC.roles.list.SoloCamp.*;
 
 import java.util.*;
@@ -32,6 +30,7 @@ public class RoleManager {
         addRole(new YuukiRole(main));
         addRole(new LimuleRole(main));
         addRole(new SoeiRole((main)));
+        //addRole(new RudraRole(main));
     }
 
     /**
@@ -90,49 +89,58 @@ public class RoleManager {
         playerRoles.put(player.getUniqueId(), role);
         role.giveRole(player);
     }
-
+    public Role getRole(UUID pl)
+    {
+        return playerRoles.get(pl);
+    }
     /**
      * Retire le rôle d'un joueur.
      */
-    public void removeRole(Player player) {
-        playerRoles.remove(player.getUniqueId());
+    public void removeRole(UUID player) {
+        playerRoles.remove(player);
     }
 
     /**
      * Récupère le rôle d'un joueur.
      */
-    public Role getPlayerRole(Player player) {
-        return playerRoles.get(player.getUniqueId());
+    public Role getPlayerRole(UUID player) {
+        return playerRoles.get(player);
     }
 
-    public int getAliveCampsCount(List<Player> players) {
-        int aliveCampsCount = 0;
+    public int getAliveCampsCount(List<UUID> players) {
+        if (players == null || players.isEmpty()) return 0;
 
-        for (Player player : players) {
-            if (player != null && player.isOnline() && !player.isDead()) {
-                Role role = main.getRoleManager().getPlayerRole(player);
-                if (role != null && role.getCamp() != null && role.getCamp() != Role.Camp.SOLITAIRE) {
-                    aliveCampsCount++;
+        Set<Role.Camp> activeCamps = new HashSet<>();
+        int solitairesCount = 0;
+
+        for (UUID uuid : players) {
+            if (uuid == null) continue;
+
+            Player p = Bukkit.getPlayer(uuid);
+            // On vérifie que le joueur est bien en ligne et vivant
+            if (p != null && p.isOnline() && !p.isDead()) {
+                Role role = main.getRoleManager().getPlayerRole(uuid);
+
+                if (role != null && role.getCamp() != null) {
+                    if (role.getCamp() == Role.Camp.SOLITAIRE) {
+                        // Chaque solitaire compte comme 1 camp indépendant
+                        solitairesCount++;
+                    } else {
+                        // Les camps normaux sont regroupés (1 seul compte par camp unique)
+                        activeCamps.add(role.getCamp());
+                    }
                 }
             }
         }
-        for (Player player : players) {
-            if (player != null && player.isOnline() && !player.isDead()) {
-                Role role = main.getRoleManager().getPlayerRole(player);
-                if (role != null && role.getCamp() == Role.Camp.SOLITAIRE) {
-                    aliveCampsCount++;
-                }
-            }
-        }
 
-        return aliveCampsCount;
+        return activeCamps.size() + solitairesCount;
     }
 
-    public boolean hasRole(Player player, Role role) {
+    public boolean hasRole(UUID player, Role role) {
         Role currentRole = getPlayerRole(player);
         return currentRole != null && currentRole.equals(role);
     }
-    public boolean hasRole(Player player)
+    public boolean hasRole(UUID player)
     {
         return getPlayerRole(player) != null;
     }
@@ -162,13 +170,10 @@ public class RoleManager {
 
     public Role.Camp FinalCamp() {
         Role.Camp aliveCamp = null;
-        for (Player player : Bukkit.getOnlinePlayers())
-        {
-            if (!player.isDead())
-            {
-                aliveCamp = main.getRoleManager().getPlayerRole(player).getCamp();
-                break;
-            }
+        for (UUID player : main.getGameManager().GetActivePlayers()) {
+
+            aliveCamp = main.getRoleManager().getPlayerRole(player).getCamp();
+            break;
         }
         return aliveCamp;
     }

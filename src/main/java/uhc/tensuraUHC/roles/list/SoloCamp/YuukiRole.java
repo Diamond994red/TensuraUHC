@@ -53,9 +53,9 @@ public class YuukiRole extends Role {
         Player killer = victim.getKiller();
 
         // Vérifie si le tueur existe et qu'il s'agit bien de Yuuki
-        if (killer == null || !main.getRoleManager().hasRole(killer, this)) return;
+        if (killer == null || !main.getRoleManager().hasRole(killer.getUniqueId(), this)) return;
 
-        Role victimRole = main.getRoleManager().getPlayerRole(victim);
+        Role victimRole = main.getRoleManager().getPlayerRole(victim.getUniqueId());
         if (victimRole == null) return;
 
         killer.sendMessage(ChatColor.GOLD + "[Yuuki - Mammon] " + ChatColor.GREEN + "Vous avez volé les capacités/items de " + victim.getName() + " !");
@@ -80,7 +80,7 @@ public class YuukiRole extends Role {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!main.getRoleManager().hasRole(player, this) || stolenIfritPower == null) return;
+        if (!main.getRoleManager().hasRole(player.getUniqueId(), this) || stolenIfritPower == null) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         ItemStack item = event.getItem();

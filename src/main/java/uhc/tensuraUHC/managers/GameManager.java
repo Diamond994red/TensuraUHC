@@ -34,9 +34,9 @@ public class GameManager {
             alivePlayer = Bukkit.getOnlinePlayers().size();
         }
         else {
-            for (UUID player : GetactivePlayers())
+            for (UUID player : GetActivePlayers())
             {
-                if (main.getRoleManager().hasRole(Bukkit.getPlayer(player)))
+                if (main.getRoleManager().hasRole(player))
                 {
                     alivePlayer++;
                 }
@@ -49,9 +49,13 @@ public class GameManager {
     {
         activePlayers = players;
     }
-    List<UUID> GetactivePlayers()
+    public List<UUID> GetActivePlayers()
     {
         return activePlayers;
+    }
+    public void DeleteActivePlayer(UUID player)
+    {
+        activePlayers.remove(player);
     }
     public GameManager(TensuraUHC main) {
         this.main = main;
@@ -93,6 +97,7 @@ public class GameManager {
             p.teleport(new Location(world, 0, y, 0));
 
             main.getNoDamagePlayers().add(p.getUniqueId());
+            main.getNoFallPlayer().clear();
             p.getInventory().setArmorContents(null);
 
             if (main.getStarterKit() != null) {
@@ -126,10 +131,12 @@ public class GameManager {
     private void startLoop() {
         if (gameTask != null) gameTask.cancel();
         activePlayers.clear();
-
+        main.getRoleManager().getPlayerRoles().clear();
+        main.getRoleManager().getcurrentPlayerRoles().clear();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.CREATIVE) {
                 activePlayers.add(player.getUniqueId());
+                main.getRoleManager().getPlayerRole(player.getUniqueId()).reset(player);
             }
         }
         gameTask = new BukkitRunnable() {
@@ -139,10 +146,10 @@ public class GameManager {
                     cancel();
                     return;
                 }
-                //if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
-                //{
-                //    WinGame(main.getRoleManager().FinalCamp());
-                //}
+                if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
+                {
+                    WinGame(main.getRoleManager().FinalCamp());
+                }
                 secondsInEpisode++;
                 totalGameSeconds++;
                 if (totalGameSeconds == 60) {
@@ -231,12 +238,8 @@ public class GameManager {
             gameTask = null;
         }
         Role role = null;
-        for (Player player : Bukkit.getOnlinePlayers())
-        {
-            if (!player.isDead())
-            {
-                role = main.getRoleManager().getPlayerRole(player);
-            }
+        for (UUID player : main.getGameManager().GetActivePlayers()) {
+            role = main.getRoleManager().getPlayerRole(player);
         }
         Map<Role.Camp, String> messagesVictoire = new EnumMap<>(Role.Camp.class);
         messagesVictoire.put(Role.Camp.LIMULE, "de Limule et ses alliés !");
