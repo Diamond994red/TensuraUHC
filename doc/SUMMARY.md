@@ -30,3 +30,5 @@
   * [👿 Les solitaires](roles/les-solitaires/README.md)
     * [Shizue](roles/les-solitaires/shizue.md)
     * [Charybde](roles/les-solitaires/charybde.md)
+* [Spécificités](specificites/README.md)
+  * [Hypoctée liquide](specificites/hypoctee-liquide.md)

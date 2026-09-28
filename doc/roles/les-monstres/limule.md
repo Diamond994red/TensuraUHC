@@ -18,11 +18,9 @@ S'il choisit le pacte 1, 2 ou 3 :\
 Limule dispose de 20 minutes pour valider son choix. S'il n'a pas choisi à la fin du temps imparti, un pacte est attribué aléatoirement (70 % de chance pour le Pacte 4, 10 % pour chacun des autres).
 {% endhint %}
 
-Limule possède une banque de temps d'invisibilité (2 minutes au début de la partie). Grâce à l'activation de l'item "transformation", il passe en forme Slime : il devient totalement invisible, gagne _Jump Boost II_ et ne subit aucun dégât de chute. Chaque utilisation réussie du pouvoir _Prédateur_ recrédite sa banque de 60 secondes. Il n'y a pas besoin d'enlever l'armure.
+Il possède un item "Prédateur" : ​En faisant un clic droit à moins de 10 blocs de l'emplacement de mort d'un joueur et en restant 5 secondes immobile, Limule absorbe le corps pour gagner des bonus permanents :
 
-​En faisant un clic droit à moins de 5 blocs de l'emplacement de mort d'un joueur et en restant 5 secondes immobile, Limule absorbe le corps pour gagner des bonus permanents en pourcentage :
-
-<table><thead><tr><th>Nombre d'utilisations</th><th>Effets obtenus</th><th data-hidden></th><th data-hidden></th></tr></thead><tbody><tr><td>1</td><td>7,5 % speed</td><td></td><td></td></tr><tr><td>2</td><td>7,5 % speed, 10 % résistance</td><td></td><td></td></tr><tr><td>3</td><td>7,5 % speed, 10 % résistance, 20 % force</td><td></td><td></td></tr><tr><td>4</td><td>15 % speed, 10 % résistance, 20 % force</td><td></td><td></td></tr><tr><td>5</td><td>15 % speed, 20 % résistance, 20 % force</td><td></td><td></td></tr></tbody></table>
+<table><thead><tr><th>Nombre d'utilisations</th><th>Effets obtenus</th><th data-hidden></th><th data-hidden></th></tr></thead><tbody><tr><td>1</td><td>speed I</td><td></td><td></td></tr><tr><td>2</td><td>speed I, resistance I</td><td></td><td></td></tr><tr><td>3</td><td>speed I, resistance I, force I</td><td></td><td></td></tr><tr><td>4</td><td>speed II, resistance I, force I</td><td></td><td></td></tr><tr><td>5</td><td>speed II, resistance II, force I</td><td></td><td></td></tr></tbody></table>
 
 {% hint style="danger" %}
 Si le pacte 4 est choisit, seules 3 utilisations sont possibles.
@@ -31,13 +29,11 @@ Si le pacte 3 est choisit, seules 4 utilisations sont possibles.
 {% endhint %}
 
 {% hint style="warning" %}
-Une mort ne permet qu'une seule utilisation et n'est utilisable que toutes les 2 minutes.
+Une mort ne permet qu'une seule utilisation et n'est utilisable que toutes les 5 minutes.
 {% endhint %}
 
-Chaque hypoctée liquide concentré qu'il craft lui permet d'avoir une vie supplémentaire ou de se régénérer entièrement (celle-ci peut être donnée grâce à la commande /t givelife \[pseudo]).
+Chaque hypoctée liquide concentré qu'il craft lui permet d'avoir une vie supplémentaire ou de se régénérer entièrement.
 
-Aussi, il connaîtra à l'annonce des rôles [<mark style="color:green;">Veldra</mark>](veldra.md) puis toutes les 20 minutes [<mark style="color:green;">Riguru'd</mark>](rigurud.md), puis [<mark style="color:green;">Ranga</mark>](ranga.md), [<mark style="color:green;">Benimaru</mark>](benimaru.md), [<mark style="color:green;">Gabiru</mark> ](gabiru.md)et [<mark style="color:green;">Gerudo</mark>](gerudo.md). De plus, avec le pacte 4, <mark style="color:green;">Limule</mark> aura un chat commun avec eux quand ils se connaîtront avec la commande /t chat
-
-Enfin, il peut obtenir 10 % de speed, 10 % de résistance et 10 % de force en étant respectivement à 15 blocs ou moins de [<mark style="color:green;">Ranga</mark>](ranga.md) si le pacte 2 ou 3 est choisit, [<mark style="color:yellow;">Shizue</mark>](../les-solitaires/shizue.md) si ils gagnent ensemble et [<mark style="color:green;">Veldra</mark>](veldra.md) si le pacte 1 ou 3 est choisit.
+Aussi, il connaîtra à l'annonce des rôles [<mark style="color:green;">Veldra</mark>](veldra.md) puis toutes les 20 minutes [<mark style="color:green;">Riguru'd</mark>](rigurud.md), puis [<mark style="color:green;">Ranga</mark>](ranga.md), [<mark style="color:green;">Benimaru</mark>](benimaru.md), [<mark style="color:green;">Gabiru</mark> ](gabiru.md)et [<mark style="color:green;">Gerudo</mark>](gerudo.md) (Si le pacte 4 est choisit). De plus, <mark style="color:green;">Limule</mark> aura un chat commun avec eux quand ils se connaîtront avec la commande /tr chat.
 
 <img src="/broken/files/Mz18doGqCz4JeaUx2oQC" alt="" data-size="original">
