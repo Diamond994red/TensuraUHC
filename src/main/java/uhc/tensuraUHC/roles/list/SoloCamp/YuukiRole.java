@@ -27,7 +27,7 @@ public class YuukiRole extends Role {
 
     // Instance indépendante d'Ifrit pour Yuuki
     private IfritPower stolenIfritPower = null;
-    private SoeiPower stolenSoeiPower = null;
+    private SoeiInvisiblePower stolenSoeiPower = null;
     public YuukiRole(TensuraUHC main) {
         super(main, "Yuuki", Camp.SOLITAIRE, "Expert des arts martiaux et grand manipulateur tapi dans l'ombre, vous recevez un livre Sharpness III, " +
                 "et pourrez avec /tr choisir, choisir un rôle de façade parmi tous les monstres disponibles du mode de jeu.");
@@ -68,7 +68,7 @@ public class YuukiRole extends Role {
             killer.sendMessage(ChatColor.GREEN + "Tapez /tr claim pour les récupérer.");
         }
         else if (victimRole instanceof SoeiRole) {
-            this.stolenSoeiPower = new SoeiPower(main);
+            this.stolenSoeiPower = new SoeiInvisiblePower(main);
             this.stolenSoeiPower.activate(killer);
             killer.sendMessage(ChatColor.GREEN + "Vous pouvez maintenant vous mettre invisible en enlevant votre armure.");
         }

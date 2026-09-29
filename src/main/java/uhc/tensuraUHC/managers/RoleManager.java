@@ -30,7 +30,7 @@ public class RoleManager {
         addRole(new YuukiRole(main));
         addRole(new LimuleRole(main));
         addRole(new SoeiRole((main)));
-        //addRole(new RudraRole(main));
+        addRole(new RudraRole(main));
     }
 
     /**

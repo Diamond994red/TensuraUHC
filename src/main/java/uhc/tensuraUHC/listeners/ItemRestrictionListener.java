@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import uhc.tensuraUHC.TensuraUHC;
-import uhc.tensuraUHC.powers.SoeiPower;
+import uhc.tensuraUHC.powers.SoeiInvisiblePower;
 
 public class ItemRestrictionListener implements Listener {
 
@@ -118,7 +118,7 @@ public class ItemRestrictionListener implements Listener {
 
             boolean eligible = false;
             boolean hasArmor = false;
-            for (Player pl : SoeiPower.getPlayers()) {
+            for (Player pl : SoeiInvisiblePower.getPlayers()) {
                 if (pl == player) {
                     eligible = true;
                 }

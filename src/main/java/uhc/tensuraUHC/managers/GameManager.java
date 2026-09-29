@@ -148,10 +148,10 @@ public class GameManager {
                     cancel();
                     return;
                 }
-                if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
-                {
-                    WinGame(main.getRoleManager().FinalCamp());
-                }
+                //if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
+                //{
+                //    WinGame(main.getRoleManager().FinalCamp());
+                //}
                 secondsInEpisode++;
                 totalGameSeconds++;
                 if (totalGameSeconds == 60) {

@@ -160,7 +160,7 @@ public class ShizuRole extends Role {
                         }
                     }
                 }
-                if (main.getGameManager().IsNewEp()) {
+                if (main.getGameManager().getSecondsInEpisode() +1 == main.getEpisodeLengthSeconds()) { //Pour être sûr de son activation (se déroule juste avant l'épisode suivant)
                     player.sendMessage(ChatColor.GREEN + "Vous êtes restée " + formatTime(CurrentLimuleTime) + " avec Limule cet épisode.");
                     CurrentLimuleTime = 0;
                 }

@@ -1,34 +1,25 @@
 package uhc.tensuraUHC.powers;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
-import uhc.tensuraUHC.roles.list.MonstersCamp.SoeiRole;
-import uhc.tensuraUHC.roles.list.SoloCamp.YuukiRole;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoeiPower {
+public class SoeiInvisiblePower {
 
     private final TensuraUHC main;
     private BukkitTask invisibilityTask;
-    private boolean hasArmor =false;
     static List<Player> players = new ArrayList<>();
 
-    public SoeiPower(TensuraUHC main) {
+    public SoeiInvisiblePower(TensuraUHC main) {
         this.main = main;
     }
 
@@ -55,7 +46,7 @@ public class SoeiPower {
 
             public void run() {
                 if (!player.isOnline()) return;
-
+                boolean hasArmor = false;
                 for (ItemStack armorPiece : player.getEquipment().getArmorContents()) {
                     if (armorPiece != null && armorPiece.getType() != Material.AIR) {
                         hasArmor = true;
@@ -70,6 +61,9 @@ public class SoeiPower {
                         added = true;
                         removed = false;
                         main.getNoFallPlayer().add(player.getUniqueId());
+                        for (Player online : Bukkit.getOnlinePlayers()) {
+                            online.hidePlayer(player);
+                        }
                     }
                 } else {
                     if (!removed)
@@ -77,6 +71,9 @@ public class SoeiPower {
                         added = false;
                         removed = true;
                         main.getNoFallPlayer().remove(player.getUniqueId());
+                        for (Player online : Bukkit.getOnlinePlayers()) {
+                            online.showPlayer(player);
+                        }
                     }
                     if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                         player.removePotionEffect(PotionEffectType.INVISIBILITY);

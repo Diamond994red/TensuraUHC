@@ -1,9 +1,6 @@
 package uhc.tensuraUHC.roles.list.MonstersCamp;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -14,14 +11,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
-import uhc.tensuraUHC.powers.SoeiPower;
+import uhc.tensuraUHC.powers.SoeiInvisiblePower;
 import uhc.tensuraUHC.roles.Role;
 
 import java.util.*;
 
 public class SoeiRole extends Role {
 
-    private SoeiPower soeiPower = null;
+    private SoeiInvisiblePower soeiInvisiblePower = null;
     private BukkitTask threadCheckTask;
     private int usedThread = 0;
     // Liste des pièges/fils actifs sur la carte
@@ -59,8 +56,8 @@ public class SoeiRole extends Role {
         addItem(fil);
 
         // Distribution de l'item au joueur
-        soeiPower = new SoeiPower(main);
-        soeiPower.activate(player);
+        soeiInvisiblePower = new SoeiInvisiblePower(main);
+        soeiInvisiblePower.activate(player);
         startThreadCheck(player);
         super.giveRole(player);
     }
@@ -77,8 +74,10 @@ public class SoeiRole extends Role {
         if (item == null || item.getType() != Material.STRING || !item.hasItemMeta()) return;
 
         ItemMeta meta = item.getItemMeta();
-        if (meta.hasDisplayName() && meta.getDisplayName().equals(ChatColor.RED + "Fil d'écoute") && usedThread >= 2) {
+        if (meta.hasDisplayName() && meta.getDisplayName().equals(ChatColor.RED + "Fil d'écoute") && usedThread <= 2) {
             Location placedLoc = event.getBlockPlaced().getLocation();
+            World world = placedLoc.getWorld();
+            world.getBlockAt(placedLoc).setType(Material.AIR);
             activeTraps.add(new ThreadTrap(placedLoc));
             usedThread ++;
             player.sendMessage(ChatColor.GREEN + "[Soei] Fil posé en X: " + placedLoc.getBlockX()
@@ -108,10 +107,6 @@ public class SoeiRole extends Role {
                                 trap.usesLeft--;
 
                                 // Récupération des informations du joueur
-                                Role targetRole = main.getRoleManager().getPlayerRole(target.getUniqueId());
-                                String roleName = (targetRole != null) ? targetRole.getName() : "Aucun";
-                                String campName = (targetRole != null && targetRole.getCamp() != null) ? targetRole.getCamp().name() : "Inconnu";
-
                                 StringBuilder effectsStr = new StringBuilder();
                                 for (PotionEffect effect : target.getActivePotionEffects()) {
                                     if (effectsStr.length() > 0) effectsStr.append(", ");
@@ -126,9 +121,7 @@ public class SoeiRole extends Role {
                                 // Envoi des informations à Soei
                                 player.sendMessage(ChatColor.GOLD + "========== [Soei - Rapport Fil] ==========");
                                 player.sendMessage(ChatColor.YELLOW + "Joueur repéré : " + ChatColor.WHITE + target.getName());
-                                player.sendMessage(ChatColor.GRAY + "Rôle : " + ChatColor.GREEN + roleName);
-                                player.sendMessage(ChatColor.GRAY + "Camp : " + ChatColor.AQUA + campName);
-                                player.sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectsStr.toString());
+                                player.sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectsStr);
                                 player.sendMessage(ChatColor.GOLD + "==========================================");
 
                                 // Si le fil a atteint 3 utilisations, on le détruit
@@ -136,7 +129,7 @@ public class SoeiRole extends Role {
                                     if (trapLoc.getBlock().getType() == Material.STRING || trapLoc.getBlock().getType() == Material.TRIPWIRE) {
                                         trapLoc.getBlock().setType(Material.AIR);
                                     }
-                                    player.sendMessage(ChatColor.RED + "[Soei] L'un de vos fils d'infiltration a été entièrement consumé.");
+                                    player.sendMessage(ChatColor.RED + "[TensuraUHC] L'un de vos fils d'infiltration a été entièrement consumé.");
                                     iterator.remove();
                                     break;
                                 }
@@ -176,9 +169,9 @@ public class SoeiRole extends Role {
             }
         }
         activeTraps.clear();
-        if (soeiPower != null) {
-            soeiPower.reset(player);
-            soeiPower = null;
+        if (soeiInvisiblePower != null) {
+            soeiInvisiblePower.reset(player);
+            soeiInvisiblePower = null;
         }
         if (player != null && player.isOnline()) {
             player.removePotionEffect(PotionEffectType.INVISIBILITY);
