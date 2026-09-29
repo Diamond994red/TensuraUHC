@@ -1,5 +1,6 @@
 package uhc.tensuraUHC.roles.list.MonstersCamp;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -162,8 +163,9 @@ public class SoeiRole extends Role {
     }
 
     @Override
-    public void reset(Player player) {
-        super.reset(player);
+    public void reset(UUID pl) {
+        Player player = Bukkit.getPlayer(pl);
+        super.reset(pl);
 
         if (threadCheckTask != null) threadCheckTask.cancel();
 

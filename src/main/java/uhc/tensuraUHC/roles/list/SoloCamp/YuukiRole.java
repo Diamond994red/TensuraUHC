@@ -1,5 +1,6 @@
 package uhc.tensuraUHC.roles.list.SoloCamp;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,6 +18,7 @@ import uhc.tensuraUHC.roles.list.MonstersCamp.SoeiRole;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class YuukiRole extends Role {
 
@@ -108,8 +110,9 @@ public class YuukiRole extends Role {
     }
 
     @Override
-    public void reset(Player player) {
-        super.reset(player);
+    public void reset(UUID pl) {
+        Player player = Bukkit.getPlayer(pl);
+        super.reset(pl);
 
         // Réinitialisation d'Ifrit s'il a été volé
         if (stolenIfritPower != null) {

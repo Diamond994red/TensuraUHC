@@ -136,7 +136,9 @@ public class GameManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.CREATIVE) {
                 activePlayers.add(player.getUniqueId());
-                main.getRoleManager().getPlayerRole(player.getUniqueId()).reset(player);
+                if (main.getRoleManager().hasRole(player.getUniqueId())) {
+                    main.getRoleManager().getPlayerRole(player.getUniqueId()).reset(player.getUniqueId());
+                }
             }
         }
         gameTask = new BukkitRunnable() {

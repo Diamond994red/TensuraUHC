@@ -162,8 +162,6 @@ public class TensuraUHC extends JavaPlugin {
         } else {
             playerTeam.addEntry(player.getName());
         }
-
-        giveMenuItem(player);
     }
 
     public void buildGlassCage(Location center) {

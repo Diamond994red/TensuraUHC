@@ -101,8 +101,9 @@ public class ShizuRole extends Role {
     }
 
     @Override
-    public void reset(Player player) {
-        super.reset(player);
+    public void reset(UUID pl) {
+        Player player = Bukkit.getPlayer(pl);
+        super.reset(pl);
         ifritPower.reset(player);
         if (proximityTask != null) {
             proximityTask.cancel();

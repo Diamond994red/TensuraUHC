@@ -399,7 +399,8 @@ public class LimuleRole extends Role {
     }
 
     @Override
-    public void reset(Player player) {
+    public void reset(UUID pl) {
+        Player player = Bukkit.getPlayer(pl);
         // 1. Annulation des tâches répétitives
         if (pactTimer != null) { pactTimer.cancel(); pactTimer = null; }
         if (revealTimer != null) { revealTimer.cancel(); revealTimer = null; }
@@ -426,7 +427,7 @@ public class LimuleRole extends Role {
         this.isAbsorbing = false;
 
         // 4. Appel du reset parent pour remettre la vie par défaut
-        super.reset(player);
+        super.reset(pl);
     }
 
     public void addTestDeathLocation(Location location) {
