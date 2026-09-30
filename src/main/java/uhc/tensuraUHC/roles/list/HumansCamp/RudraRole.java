@@ -4,7 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -47,22 +50,63 @@ public class RudraRole extends Role {
 
     /**
      * Crée un Scoreboard privé pour Rudra lui permettant d'observer
-     * la vie (HP) des autres joueurs au-dessus de leur tête et dans le Tablist.
+     * la vie (HP) des autres joueurs sous leur pseudo.
      */
-    private void setupHealthDisplay(Player player) {
+    private void setupHealthDisplay(Player rudra) {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 
-        // Objectif 1 : Affichage au-dessus du pseudo (Name Tag)
+        // En 1.8.8, on utilise la chaîne "health"
         Objective nameHealth = scoreboard.registerNewObjective("showHealthName", "health");
         nameHealth.setDisplaySlot(DisplaySlot.BELOW_NAME);
         nameHealth.setDisplayName(ChatColor.RED + "❤");
 
-        // Objectif 2 : Affichage dans le menu TAB
-        Objective tabHealth = scoreboard.registerNewObjective("showHealthTab", "health");
-        tabHealth.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        // Assigne le scoreboard uniquement à Rudra
+        rudra.setScoreboard(scoreboard);
 
-        // Assigne le scoreboard uniquement au joueur ayant ce rôle
-        player.setScoreboard(scoreboard);
+        // Initialisation des HP de tous les joueurs sur le scoreboard de Rudra
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            nameHealth.getScore(target.getName()).setScore((int) Math.ceil(target.getHealth()));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player victim = ((Player) event.getEntity()).getPlayer();
+            syncHealthForRudra(victim);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerHeal(EntityRegainHealthEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player victim = ((Player) event.getEntity()).getPlayer();
+            syncHealthForRudra(victim);
+        }
+    }
+
+    /**
+     * Attend 1 tick pour lire la vie réelle de la victime et met à jour uniquement le scoreboard de Rudra.
+     */
+    private void syncHealthForRudra(Player victim) {
+        Bukkit.getScheduler().runTask(main, () -> {
+            if (!victim.isOnline()) return;
+
+            int healthScore = (int) Math.ceil(victim.getHealth());
+
+            // Recherche le joueur qui a le rôle Rudra dans la partie
+            for (UUID uuid : main.getGameManager().GetActivePlayers()) {
+                if (main.getRoleManager().hasRole(uuid, this)) {
+                    Player rudra = Bukkit.getPlayer(uuid);
+                    if (rudra != null && rudra.isOnline()) {
+                        Objective obj = rudra.getScoreboard().getObjective("showHealthName");
+                        if (obj != null) {
+                            obj.getScore(victim.getName()).setScore(healthScore);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @EventHandler
@@ -132,7 +176,7 @@ public class RudraRole extends Role {
                     }
 
                     // Calcul du niveau de résistance
-                    int cappedCount = Math.min(humanCount, 9);
+                    int cappedCount = Math.min(humanCount, 6);
                     int resLvl = cappedCount / 3;
 
                     if (getPassiveEffects() != null) {
@@ -142,9 +186,9 @@ public class RudraRole extends Role {
                     player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 
                     // Application du nouvel effet (Amplifier 0 = Resistance 1)
-                    if (resLvl > 0) {
-                        addPassiveEffect(PotionEffectType.DAMAGE_RESISTANCE, resLvl - 1);
-                    }
+
+                    addPassiveEffect(PotionEffectType.DAMAGE_RESISTANCE, resLvl);
+
 
                     isSomeoneDead = false;
                 }

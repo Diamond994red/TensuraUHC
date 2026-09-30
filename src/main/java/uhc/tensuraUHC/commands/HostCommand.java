@@ -34,7 +34,10 @@ public class HostCommand implements CommandExecutor {
             }
 
             if (args.length != 1) {
-                sender.sendMessage(ChatColor.RED + "Utilisation : /host <joueur>");
+                if (sender instanceof Player)
+                {
+                    main.getGuiManager().openUHCMenu((Player) sender);
+                }
                 return true;
             }
 

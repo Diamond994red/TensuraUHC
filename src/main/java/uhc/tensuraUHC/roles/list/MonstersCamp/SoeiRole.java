@@ -1,5 +1,6 @@
 package uhc.tensuraUHC.roles.list.MonstersCamp;
 
+import jdk.internal.org.jline.utils.Log;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,11 +11,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.permissions.BroadcastPermissions;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.powers.SoeiInvisiblePower;
 import uhc.tensuraUHC.roles.Role;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SoeiRole extends Role {
 
@@ -31,7 +34,7 @@ public class SoeiRole extends Role {
                         "Posez votre fil au sol pour analyser les 3 prochains joueurs qui passeront à proximité.");
         addPassiveEffect(PotionEffectType.SPEED, 0);
         addPower("Infiltration", "Vous devenez invisible lorsque vous ne portez aucune pièce d'armure.");
-        addPower("Fil d'écoute", "Posez votre fil au sol pour révéler le rôle, le camp et les effets des 3 prochains joueurs s'en approchant.");
+        addPower("Fil d'écoute", "Posez votre fil au sol pour révéler un des effets des 3 prochains joueurs s'en approchant.");
     }
 
     @Override
@@ -107,21 +110,25 @@ public class SoeiRole extends Role {
                                 trap.usesLeft--;
 
                                 // Récupération des informations du joueur
-                                StringBuilder effectsStr = new StringBuilder();
-                                for (PotionEffect effect : target.getActivePotionEffects()) {
-                                    if (effectsStr.length() > 0) effectsStr.append(", ");
-                                    effectsStr.append(effect.getType().getName())
-                                            .append(" ")
-                                            .append(effect.getAmplifier() + 1);
-                                }
-                                if (effectsStr.length() == 0) {
-                                    effectsStr.append("Aucun effet");
+                                Collection<PotionEffect> activeEffects = target.getActivePotionEffects();
+                                String effectStr;
+
+                                if (!activeEffects.isEmpty()) {
+                                    // Convertir en liste pour pouvoir sélectionner par index
+                                    List<PotionEffect> effectsList = new ArrayList<>(activeEffects);
+
+                                    // Tirer un effet au sort
+                                    PotionEffect randomEffect = effectsList.get(ThreadLocalRandom.current().nextInt(effectsList.size()));
+
+                                    effectStr = randomEffect.getType().getName();
+                                } else {
+                                    effectStr = "Aucun effet";
                                 }
 
                                 // Envoi des informations à Soei
                                 player.sendMessage(ChatColor.GOLD + "========== [Soei - Rapport Fil] ==========");
                                 player.sendMessage(ChatColor.YELLOW + "Joueur repéré : " + ChatColor.WHITE + target.getName());
-                                player.sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectsStr);
+                                player.sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectStr);
                                 player.sendMessage(ChatColor.GOLD + "==========================================");
 
                                 // Si le fil a atteint 3 utilisations, on le détruit
@@ -159,7 +166,6 @@ public class SoeiRole extends Role {
     public void reset(UUID pl) {
         Player player = Bukkit.getPlayer(pl);
         super.reset(pl);
-
         if (threadCheckTask != null) threadCheckTask.cancel();
 
         // Nettoyage des fils posés au sol
