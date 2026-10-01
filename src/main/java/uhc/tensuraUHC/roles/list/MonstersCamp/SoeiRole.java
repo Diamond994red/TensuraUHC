@@ -22,7 +22,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SoeiRole extends Role {
 
     private SoeiInvisiblePower soeiInvisiblePower = null;
-    private BukkitTask threadCheckTask;
     private int usedThread = 0;
     // Liste des pièges/fils actifs sur la carte
     private final List<ThreadTrap> activeTraps = new ArrayList<>();
@@ -44,6 +43,7 @@ public class SoeiRole extends Role {
 
     @Override
     public void giveRole(Player player) {
+        super.reset(player.getUniqueId());
         // Vider la liste pour éviter les doublons
         getItemsToGive().clear();
 
@@ -89,11 +89,17 @@ public class SoeiRole extends Role {
     }
 
     private void startThreadCheck(Player player) {
-        threadCheckTask = new BukkitRunnable() {
+        UUID pl = player.getUniqueId();
+        BukkitTask threadCheckTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (!player.isOnline() || activeTraps.isEmpty()) return;
 
+                if (activeTraps.isEmpty()) return;
+                if (main.getRoleManager().getPlayerRole(player.getUniqueId()) != SoeiRole.this) {
+                    cancel();
+                    return;
+                }
+                if (!player.isOnline()) return;
                 Iterator<ThreadTrap> iterator = activeTraps.iterator();
                 while (iterator.hasNext()) {
                     ThreadTrap trap = iterator.next();
@@ -101,7 +107,7 @@ public class SoeiRole extends Role {
 
                     for (Player target : trapLoc.getWorld().getPlayers()) {
                         // Soei ne se détecte pas lui-même
-                        if (target.equals(player)) continue;
+                        if (target.equals(Bukkit.getPlayer(pl))) continue;
 
                         // Vérifie si le joueur est à 3 blocs ou moins du fil
                         if (target.getLocation().distance(trapLoc) <= 3.0) {
@@ -126,17 +132,17 @@ public class SoeiRole extends Role {
                                 }
 
                                 // Envoi des informations à Soei
-                                player.sendMessage(ChatColor.GOLD + "========== [Soei - Rapport Fil] ==========");
-                                player.sendMessage(ChatColor.YELLOW + "Joueur repéré : " + ChatColor.WHITE + target.getName());
-                                player.sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectStr);
-                                player.sendMessage(ChatColor.GOLD + "==========================================");
+                                Bukkit.getPlayer(pl).sendMessage(ChatColor.GOLD + "========== [Soei - Rapport Fil] ==========");
+                                Bukkit.getPlayer(pl).sendMessage(ChatColor.YELLOW + "Joueur repéré : " + ChatColor.WHITE + target.getName());
+                                Bukkit.getPlayer(pl).sendMessage(ChatColor.GRAY + "Effets : " + ChatColor.LIGHT_PURPLE + effectStr);
+                                Bukkit.getPlayer(pl).sendMessage(ChatColor.GOLD + "==========================================");
 
                                 // Si le fil a atteint 3 utilisations, on le détruit
                                 if (trap.usesLeft <= 0) {
                                     if (trapLoc.getBlock().getType() == Material.STRING || trapLoc.getBlock().getType() == Material.TRIPWIRE) {
                                         trapLoc.getBlock().setType(Material.AIR);
                                     }
-                                    player.sendMessage(ChatColor.RED + "[TensuraUHC] L'un de vos fils d'infiltration a été entièrement consumé.");
+                                    Bukkit.getPlayer(pl).sendMessage(ChatColor.RED + "[TensuraUHC] L'un de vos fils d'infiltration a été entièrement consumé.");
                                     iterator.remove();
                                     break;
                                 }
@@ -146,6 +152,7 @@ public class SoeiRole extends Role {
                 }
             }
         }.runTaskTimer(main, 0L, 10L); // Vérification 2 fois par seconde
+        addTask(pl, "filsSoei",threadCheckTask);
     }
 
     // ==========================================
@@ -166,7 +173,6 @@ public class SoeiRole extends Role {
     public void reset(UUID pl) {
         Player player = Bukkit.getPlayer(pl);
         super.reset(pl);
-        if (threadCheckTask != null) threadCheckTask.cancel();
 
         // Nettoyage des fils posés au sol
         for (ThreadTrap trap : activeTraps) {

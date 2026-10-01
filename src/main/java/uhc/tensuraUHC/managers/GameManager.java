@@ -214,6 +214,7 @@ public class GameManager {
             }
         }
         for (Role role : main.getRoleManager().getRoles()) {
+            Bukkit.getLogger().info(role.getName());
             role.reset(null);
         }
 

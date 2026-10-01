@@ -21,7 +21,6 @@ import uhc.tensuraUHC.roles.Role;
 import java.util.UUID;
 
 public class ShizuRole extends Role {
-    private BukkitTask proximityTask;
     private final IfritPower ifritPower;
 
     public ShizuRole(TensuraUHC main) {
@@ -52,6 +51,9 @@ public class ShizuRole extends Role {
 
     @Override
     public void giveRole(Player player) {
+        // Nettoie les anciennes tâches et réinitialise l'état avant d'en donner un nouveau
+        reset(player.getUniqueId());
+
         getItemsToGive().clear();
 
         ItemStack fAspect = new ItemStack(Material.ENCHANTED_BOOK);
@@ -72,6 +74,8 @@ public class ShizuRole extends Role {
         addItem(fAspect);
         addItem(flame);
         addItem(IfritPower.createItem());
+
+        // On lance la tâche uniquement après avoir réinitialisé
         startProximityCheck(player);
         super.giveRole(player);
     }
@@ -103,18 +107,19 @@ public class ShizuRole extends Role {
     @Override
     public void reset(UUID pl) {
         Player player = Bukkit.getPlayer(pl);
+
+        // Annule la tâche Bukkit enregistrée dans Role via cancelAllTasks(UUID)
         super.reset(pl);
-        ifritPower.reset(player);
-        if (proximityTask != null) {
-            proximityTask.cancel();
-            proximityTask = null;
+
+        if (player != null) {
+            ifritPower.reset(player);
         }
     }
 
     private void startProximityCheck(Player initialPlayer) {
         UUID playerUUID = initialPlayer.getUniqueId(); // Stocker l'UUID
 
-        proximityTask = new BukkitRunnable() {
+        BukkitTask proximityTask = new BukkitRunnable() {
             int limuleTime = 0;
             int CurrentLimuleTime = 0;
             boolean campChanged = false;
@@ -122,6 +127,10 @@ public class ShizuRole extends Role {
             @Override
             public void run() {
                 Player player = Bukkit.getPlayer(playerUUID);
+                if (main.getRoleManager().getPlayerRole(playerUUID) != ShizuRole.this) {
+                    cancel();
+                    return;
+                }
                 if (player == null || !player.isOnline()) return;
 
                 if (!campChanged) {
@@ -166,5 +175,6 @@ public class ShizuRole extends Role {
                 }
             }
         }.runTaskTimer(main, 0L, 20L);
+        addTask(playerUUID, "ShizueLimule",proximityTask);
     }
 }

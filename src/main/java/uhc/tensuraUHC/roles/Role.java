@@ -8,6 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import uhc.tensuraUHC.TensuraUHC;
 
 import java.util.*;
@@ -91,9 +95,8 @@ public abstract class Role implements Listener {
         this.itemsToGive.add(item);
     }
 
-    public Role addEnchantBypass(Enchantment enchantment, int maxLevel) {
+    public void addEnchantBypass(Enchantment enchantment, int maxLevel) {
         this.enchantBypasses.put(enchantment, maxLevel);
-        return this;
     }
 
     // Getters et Setters
@@ -164,6 +167,7 @@ public abstract class Role implements Listener {
         int seconds = totalSeconds % 60;
         return (seconds > 0) ? String.format("%d min %d s", minutes, seconds) : minutes + " min";
     }
+
     public void reset(UUID player) {
         Player pl = Bukkit.getPlayer(player);
         if (pl != null && pl.isOnline()) {
@@ -172,7 +176,29 @@ public abstract class Role implements Listener {
             for (PotionEffect effect : passiveEffects) {
                 pl.removePotionEffect(effect.getType());
             }
+
+            Scoreboard sb = pl.getScoreboard();
+
+            // 1. Suppression explicite de l'objectif de vie s'il existe
+            if (sb != null) {
+                Bukkit.getLogger().info("sb existe");
+                Objective obj = sb.getObjective("showHealthName");
+                Bukkit.getLogger().info(sb.getObjectives().toString());
+                if (obj != null) {
+                    Bukkit.getLogger().info("obj delete");
+                    sb.clearSlot(DisplaySlot.BELOW_NAME);
+                    obj.unregister();
+                }
+            }
+
+            // 2. Remet le scoreboard principal du serveur (ou celui de votre GameManager s'il en existe un)
+            pl.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+
         }
+
+        // Annulation automatique de toutes les tâches Bukkit enregistrées pour ce joueur
+        cancelAllTasks(player);
+
         camp = initialCamp;
     }
 
@@ -211,5 +237,35 @@ public abstract class Role implements Listener {
         FakeRoleMessage(player);
     }
 
+    private final Map<UUID, Map<String, BukkitTask>> activeTasks = new HashMap<>();
+
+    protected void addTask(UUID uuid, String taskName, BukkitTask task) {
+        // Annule l'ancienne tâche avec le même nom si elle existe déjà pour cet UUID
+        Map<String, BukkitTask> userTasks = activeTasks.computeIfAbsent(uuid, k -> new HashMap<>());
+        BukkitTask oldTask = userTasks.put(taskName, task);
+
+        if (oldTask != null) {
+            int taskId = oldTask.getTaskId();
+            // Vérifie si la tâche est en cours d'exécution ou en attente
+            if (Bukkit.getScheduler().isQueued(taskId) || Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
+                oldTask.cancel();
+            }
+        }
+    }
+
+    protected void cancelAllTasks(UUID uuid) {
+        Bukkit.getLogger().info(activeTasks.size() + "");
+        Map<String, BukkitTask> tasks = activeTasks.remove(uuid);
+        Bukkit.getLogger().info(activeTasks.size() + "");
+        if (tasks != null) {
+            Bukkit.getLogger().info(tasks.size() + "");
+            tasks.forEach((taskName, task) -> {
+                if (task != null) {
+                    Bukkit.getLogger().info("Annulation de la tâche '" + taskName + "' (ID: " + task.getTaskId() + ")");
+                    task.cancel();
+                }
+            });
+        }
+    }
 
 }

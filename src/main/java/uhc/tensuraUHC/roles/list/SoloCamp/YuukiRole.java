@@ -35,6 +35,14 @@ public class YuukiRole extends Role {
         addPower("Mammon", "À chaque kill que vous faites, vous obtenez les items/pouvoirs non-utilisés de vos victimes (récupérables avec /tr claim). " +
                 "S'il n'en avait pas, vous récupérerez 1 demi-coeur permanent.");
 
+
+    }
+    @Override
+    public void giveRole(Player player) {
+        reset(player.getUniqueId());
+
+        getItemsToGive().clear();
+
         // --- Livre Sharpness III ---
         ItemStack sharp = new ItemStack(Material.ENCHANTED_BOOK);
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) sharp.getItemMeta();
@@ -46,6 +54,7 @@ public class YuukiRole extends Role {
 
         addEnchantBypass(Enchantment.DAMAGE_ALL, 4);
         addItem(sharp);
+        super.giveRole(player);
     }
 
     // --- POUVOIR MAMMON (Vol de pouvoirs au kill) ---

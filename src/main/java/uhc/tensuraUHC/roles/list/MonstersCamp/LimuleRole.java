@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
+import uhc.tensuraUHC.roles.list.SoloCamp.ShizuRole;
 
 import java.util.*;
 
@@ -27,11 +28,6 @@ public class LimuleRole extends Role {
     private int predatorUses = 0;
     private long lastPredatorTime = 0;
     private final Map<Location, Long> deathLocations = new HashMap<>();
-
-    private BukkitTask pactTimer;
-    private BukkitTask revealTimer;
-    private BukkitTask proximityTask;
-    private BukkitTask actionbarTask;
 
     public LimuleRole(TensuraUHC main) {
         super(main, "Limule", Camp.MONSTRES,
@@ -48,6 +44,7 @@ public class LimuleRole extends Role {
 
     @Override
     public void giveRole(Player player) {
+        reset(player.getUniqueId());
         getItemsToGive().clear();
 
         // 1. Création de l'item Prédateur
@@ -86,11 +83,14 @@ public class LimuleRole extends Role {
     // SELECTION DES PACTES & GUI
     // ==========================================
     private void startDeathProximityCheck(Player player) {
-        actionbarTask = new BukkitRunnable() {
+        BukkitTask actionbarTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!player.isOnline()) return;
-
+                if (main.getRoleManager().getPlayerRole(player.getUniqueId()) != LimuleRole.this) {
+                    cancel();
+                    return;
+                }
                 boolean nearDeathLocation = false;
 
                 for (Location loc : deathLocations.keySet()) {
@@ -105,6 +105,7 @@ public class LimuleRole extends Role {
                 }
             }
         }.runTaskTimer(main, 0L, 10L);
+        addTask(player.getUniqueId(), "predator",actionbarTask);
     }
 
     public void openPactGUI(Player player) {
@@ -131,11 +132,16 @@ public class LimuleRole extends Role {
     }
 
     private void startPactChoiceTimer(Player player) {
-        pactTimer = new BukkitRunnable() {
+        BukkitTask pactTimer = new BukkitRunnable() {
             int remaining = 300;
 
             @Override
             public void run() {
+                if (main.getRoleManager().getPlayerRole(player.getUniqueId()) != LimuleRole.this) {
+                    cancel();
+                    return;
+                }
+                if (!player.isOnline()) return;
                 if (chosenPact != -1) {
                     cancel();
                     return;
@@ -152,6 +158,7 @@ public class LimuleRole extends Role {
                 remaining--;
             }
         }.runTaskTimer(main, 0L, 20L);
+        addTask(player.getUniqueId(), "pact",pactTimer);
     }
 
     public void selectPact(Player player, int pactNumber) {
@@ -165,14 +172,20 @@ public class LimuleRole extends Role {
     }
 
     private void startRevealTimer(Player player) {
-        revealTimer = new BukkitRunnable() {
+        BukkitTask revealTimer = new BukkitRunnable() {
             @Override
             public void run() {
+                if (main.getRoleManager().getPlayerRole(player.getUniqueId()) != LimuleRole.this) {
+                    cancel();
+                    return;
+                }
+                if (!player.isOnline()) return;
                 if (new Random().nextInt(100) < 5) {
                     Bukkit.broadcastMessage(ChatColor.RED + "[Alerte] Limule Tempest a été repéré en position X: " + player.getLocation().getBlockX());
                 }
             }
         }.runTaskTimer(main, 12000L, 12000L);
+        addTask(player.getUniqueId(), "reveal",revealTimer);
     }
 
     // ==========================================
@@ -245,14 +258,13 @@ public class LimuleRole extends Role {
     }
 
     private boolean isAbsorbing = false;
-    private BukkitTask absorptionTask; // Pour pouvoir l'annuler au reset()
 
     // 2. Remplace la méthode startPredatorAbsorption :
     private void startPredatorAbsorption(Player player, Location deathLoc) {
         this.isAbsorbing = true;
         player.sendMessage(ChatColor.GREEN + "Absorption en cours... Ne bougez pas pendant 20 secondes !");
 
-        this.absorptionTask = new BukkitRunnable() {
+        BukkitTask absorptionTask = new BukkitRunnable() {
             int timer = 20;
             final Location startLoc = player.getLocation().clone();
 
@@ -280,6 +292,7 @@ public class LimuleRole extends Role {
                 timer--;
             }
         }.runTaskTimer(main, 0L, 20L);
+        addTask(player.getUniqueId(), "predatorAbso",absorptionTask);
     }
 
     private void applyPredatorBuffs(Player player) {
@@ -321,11 +334,15 @@ public class LimuleRole extends Role {
     // ==========================================
 
     private void startProximityCheck(Player player) {
-        proximityTask = new BukkitRunnable() {
+        BukkitTask proximityTask = new BukkitRunnable() {
             @Override
             public void run() {
                 if (!player.isOnline()) return;
-
+                if (main.getRoleManager().getPlayerRole(player.getUniqueId()) != LimuleRole.this) {
+                    cancel();
+                    return;
+                }
+                if (!player.isOnline()) return;
                 boolean boostSpeed = false;
                 boolean boostResist = false;
                 boolean boostForce = false;
@@ -354,6 +371,7 @@ public class LimuleRole extends Role {
                 applyProximityEffect(player, PotionEffectType.INCREASE_DAMAGE, boostForce);
             }
         }.runTaskTimer(main, 0L, 40L);
+        addTask(player.getUniqueId(), "proxiboost",proximityTask);
     }
 
     private void applyProximityEffect(Player player, PotionEffectType type, boolean apply) {
@@ -401,17 +419,12 @@ public class LimuleRole extends Role {
     @Override
     public void reset(UUID pl) {
         Player player = Bukkit.getPlayer(pl);
-        // 1. Annulation des tâches répétitives
-        if (pactTimer != null) { pactTimer.cancel(); pactTimer = null; }
-        if (revealTimer != null) { revealTimer.cancel(); revealTimer = null; }
-        if (proximityTask != null) { proximityTask.cancel(); proximityTask = null; }
-        if (actionbarTask != null) { actionbarTask.cancel(); actionbarTask = null; }
-
+        super.reset(pl);
         // 2. Réinitialisation des variables de rôle
-        this.chosenPact = -1;
-        this.predatorUses = 0;
-        this.lastPredatorTime = 0;
-        this.deathLocations.clear();
+        chosenPact = -1;
+        predatorUses = 0;
+        lastPredatorTime = 0;
+        deathLocations.clear();
 
         // 3. Nettoyage des effets passifs dynamiques ajoutés
         if (player != null && player.isOnline()) {
@@ -420,14 +433,7 @@ public class LimuleRole extends Role {
             }
         }
         getPassiveEffects().clear();
-        if (absorptionTask != null) {
-            absorptionTask.cancel();
-            absorptionTask = null;
-        }
         this.isAbsorbing = false;
-
-        // 4. Appel du reset parent pour remettre la vie par défaut
-        super.reset(pl);
     }
 
     public void addTestDeathLocation(Location location) {

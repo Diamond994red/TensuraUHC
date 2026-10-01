@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -24,7 +25,6 @@ import java.util.UUID;
 
 public class RudraRole extends Role {
 
-    private BukkitTask humanTask;
     private boolean isSomeoneDead = false;
 
     public RudraRole(TensuraUHC main) {
@@ -38,6 +38,7 @@ public class RudraRole extends Role {
 
     @Override
     public void giveRole(Player player) {
+        reset(player.getUniqueId());
         getItemsToGive().clear();
         isSomeoneDead = true;
 
@@ -94,8 +95,8 @@ public class RudraRole extends Role {
 
             int healthScore = (int) Math.ceil(victim.getHealth());
 
-            // Recherche le joueur qui a le rôle Rudra dans la partie
             for (UUID uuid : main.getGameManager().GetActivePlayers()) {
+                // S'assure que le joueur est en ligne ET qu'il a TOUJOURS ce rôle
                 if (main.getRoleManager().hasRole(uuid, this)) {
                     Player rudra = Bukkit.getPlayer(uuid);
                     if (rudra != null && rudra.isOnline()) {
@@ -132,67 +133,59 @@ public class RudraRole extends Role {
     @Override
     public void reset(UUID pl) {
         Player player = Bukkit.getPlayer(pl);
-        if (player != null && player.isOnline()) {
-            // Re-met le scoreboard par défaut lors d'un reset
-            player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-        }
-
-        if (humanTask != null) {
-            humanTask.cancel();
-            humanTask = null;
-        }
-
+        // 3. Appel de la méthode parente (annule les tâches Bukkit et réinitialise le camp)
         super.reset(pl);
     }
 
     void startHumainLeftCheck(UUID pl) {
-        if (humanTask != null) {
-            humanTask.cancel();
-        }
 
-        humanTask = new BukkitRunnable() {
+        BukkitTask humanTask = new BukkitRunnable() {
             @Override
             public void run() {
                 Player player = Bukkit.getPlayer(pl);
 
-                // Annulation de la tâche si le joueur est hors-ligne
                 if (player == null || !player.isOnline()) {
+                    return;
+                }
+                if (!main.getRoleManager().hasRole(pl, RudraRole.this)) {
                     cancel();
                     return;
                 }
 
-                if (isSomeoneDead) {
-                    int humanCount = 0;
+                int humanCount = 0;
 
-                    // Vérification de sécurité pour éviter les NullPointerException
-                    if (main != null && main.getGameManager() != null && main.getRoleManager() != null) {
-                        for (UUID pls : main.getGameManager().GetActivePlayers()) {
-                            Role role = main.getRoleManager().getPlayerRole(pls);
-                            // Vérifie qu'un rôle est bien assigné avant d'appeler getCamp()
-                            if (role != null && role.getCamp() == Camp.HUMAINS) {
-                                humanCount++;
-                            }
+                if (main.getGameManager() != null && main.getRoleManager() != null) {
+                    for (UUID pls : main.getGameManager().GetActivePlayers()) {
+                        Role role = main.getRoleManager().getPlayerRole(pls);
+                        if (role != null && role.getCamp() == Camp.HUMAINS) {
+                            humanCount++;
                         }
                     }
+                }
 
-                    // Calcul du niveau de résistance
+                // 1. Retrait des anciens effets enregistrés dans passiveEffects
+                for (PotionEffect effect : getPassiveEffects()) {
+                    player.removePotionEffect(effect.getType());
+                }
+
+                // Clear de la liste avant d'ajouter le nouveau niveau
+                getPassiveEffects().clear();
+
+                // 2. Calcul et enregistrement du nouvel effet si des humains sont en vie
+                if (humanCount > 0) {
                     int cappedCount = Math.min(humanCount, 6);
                     int resLvl = cappedCount / 3;
 
-                    if (getPassiveEffects() != null) {
-                        getPassiveEffects().clear();
-                    }
-
-                    player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-
-                    // Application du nouvel effet (Amplifier 0 = Resistance 1)
-
+                    // addPassiveEffect() ajoute l'effet dans la liste passiveEffects
                     addPassiveEffect(PotionEffectType.DAMAGE_RESISTANCE, resLvl);
+                }
 
-
-                    isSomeoneDead = false;
+                // 3. Application des nouveaux effets passifs au joueur
+                for (PotionEffect effect : getPassiveEffects()) {
+                    player.addPotionEffect(effect);
                 }
             }
         }.runTaskTimer(main, 0L, 20L);
+        addTask(pl,"humains",humanTask);
     }
 }
