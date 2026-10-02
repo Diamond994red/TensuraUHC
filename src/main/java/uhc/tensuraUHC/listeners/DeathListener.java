@@ -3,6 +3,7 @@ package uhc.tensuraUHC.listeners;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +21,8 @@ public class DeathListener implements Listener {
         this.main = main;
     }
 
-    @EventHandler
+    // Execution en priority HIGH pour laisser les Listeners de Rôles traiter les effets/conversions au préalable (NORMAL/LOW)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player victimPlayer = event.getEntity();
         UUID victim = victimPlayer.getUniqueId();
@@ -33,9 +35,9 @@ public class DeathListener implements Listener {
 
         Location deathLocation = victimPlayer.getLocation();
 
-        // 1. Vérification stricte
+        // 1. Vérification de l'annonce des rôles
         boolean rolesRevealed = (main.getGameManager() != null && main.getGameManager().GetRolesRevealed())
-                || (main.getGameManager().getTotalGameSeconds() >= main.GetRoleTime());
+                || (main.getGameManager() != null && main.getGameManager().getTotalGameSeconds() >= main.GetRoleTime());
 
         // 2. MODIFICATIONS SYNCHRONES (Immédiates pendant l'event)
         if (rolesRevealed) {
@@ -54,6 +56,7 @@ public class DeathListener implements Listener {
                 deathLocation.getWorld().dropItemNaturally(deathLocation, new ItemStack(Material.GOLDEN_APPLE, 1));
             }
 
+            // On retire le rôle et l'état de joueur actif seulement si les rôles sont révélés
             main.getRoleManager().removeRole(victim);
             main.getGameManager().DeleteActivePlayer(victim);
         }
@@ -63,7 +66,7 @@ public class DeathListener implements Listener {
             Player p = Bukkit.getPlayer(victim);
             if (p == null || !p.isOnline()) return;
 
-            // Force le respawn instantané via l'objet Player récupéré
+            // Force le respawn instantané via l'API Spigot
             p.spigot().respawn();
 
             if (!rolesRevealed) {

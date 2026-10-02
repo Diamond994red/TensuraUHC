@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uhc.tensuraUHC.TensuraUHC;
 import uhc.tensuraUHC.roles.Role;
+import uhc.tensuraUHC.roles.list.ClownsCamp.ClaymanRole;
 import uhc.tensuraUHC.roles.list.HumansCamp.KondouRole;
 import uhc.tensuraUHC.roles.list.HumansCamp.RudraRole;
 import uhc.tensuraUHC.roles.list.MonstersCamp.*;
@@ -33,6 +34,7 @@ public class RoleManager {
         addRole(new SoeiRole((main)));
         addRole(new RudraRole(main));
         addRole(new KondouRole(main));
+        addRole(new ClaymanRole(main));
     }
 
     /**

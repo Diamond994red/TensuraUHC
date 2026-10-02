@@ -88,22 +88,25 @@ public class SoeiInvisiblePower {
 
     // --- GESTION DU NAMETAG ---
 
-    private void hideNametag(Player player) {
-        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team team = board.getTeam("soei_invis");
-        if (team == null) {
-            team = board.registerNewTeam("soei_invis");
-            // Méthode spécifique à la 1.8.8 :
-            team.setNameTagVisibility(NameTagVisibility.NEVER);
+    private void hideNametag(Player invisiblePlayer) {
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            Scoreboard board = online.getScoreboard();
+            Team team = board.getTeam("soei_invis");
+            if (team == null) {
+                team = board.registerNewTeam("soei_invis");
+                team.setNameTagVisibility(NameTagVisibility.NEVER);
+            }
+            team.addEntry(invisiblePlayer.getName());
         }
-        team.addEntry(player.getName());
     }
 
-    private void showNametag(Player player) {
-        Scoreboard board = Bukkit.getScoreboardManager().getMainScoreboard();
-        Team team = board.getTeam("soei_invis");
-        if (team != null && team.hasEntry(player.getName())) {
-            team.removeEntry(player.getName());
+    private void showNametag(Player invisiblePlayer) {
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            Scoreboard board = online.getScoreboard();
+            Team team = board.getTeam("soei_invis");
+            if (team != null && team.hasEntry(invisiblePlayer.getName())) {
+                team.removeEntry(invisiblePlayer.getName());
+            }
         }
     }
 

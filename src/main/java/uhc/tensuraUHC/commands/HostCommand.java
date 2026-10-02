@@ -191,7 +191,7 @@ public class HostCommand implements CommandExecutor {
             // Protection contre les dégâts de chute temporaires
             main.getNoDamagePlayers().add(target.getUniqueId());
             Bukkit.getScheduler().runTaskLater(main, () -> main.getNoDamagePlayers().remove(target.getUniqueId()), 60L);
-
+            main.getGameManager().SetActivePlayer(target.getUniqueId());
             Bukkit.broadcastMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.GREEN + target.getName() + " a été ressuscité par l'Host !");
             return true;
         }

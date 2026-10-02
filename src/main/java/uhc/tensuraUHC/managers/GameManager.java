@@ -44,9 +44,9 @@ public class GameManager {
         return alivePlayer;
     }
     List<UUID> activePlayers = new ArrayList<>();
-    private void SetActivePlayers(List<UUID> players)
+    public void SetActivePlayer(UUID players)
     {
-        activePlayers = players;
+        activePlayers.add(players);
     }
     public List<UUID> GetActivePlayers()
     {

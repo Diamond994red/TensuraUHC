@@ -188,5 +188,6 @@ public class SoeiRole extends Role {
         if (player != null && player.isOnline()) {
             player.removePotionEffect(PotionEffectType.INVISIBILITY);
         }
+        usedThread = 0;
     }
 }

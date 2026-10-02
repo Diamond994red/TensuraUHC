@@ -204,7 +204,7 @@ public abstract class Role implements Listener {
 
     public void GetRoleDescription(Player player) {
         player.sendMessage(ChatColor.GOLD + "================-================");
-        player.sendMessage(ChatColor.YELLOW + "Vous êtes : " + ChatColor.BOLD + (camp == Camp.LIMULE ? ChatColor.DARK_GREEN : camp == Camp.SHIZUE ? ChatColor.LIGHT_PURPLE : camp == Camp.MONSTRES ? ChatColor.GREEN : camp == Camp.HUMAINS ? ChatColor.AQUA : camp == Camp.SOLITAIRE ? ChatColor.GOLD : ChatColor.DARK_PURPLE) + name);
+        player.sendMessage(ChatColor.YELLOW + "Vous êtes : " + ChatColor.BOLD + (camp == Camp.LIMULE ? ChatColor.DARK_GREEN : camp == Camp.SHIZUE ? ChatColor.LIGHT_PURPLE : camp == Camp.MONSTRES ? ChatColor.GREEN : camp == Camp.HUMAINS ? ChatColor.AQUA : camp == Camp.SOLITAIRE ? ChatColor.GOLD : ChatColor.DARK_BLUE) + name);
         player.sendMessage("Vous devez gagner" + (camp == Camp.SOLITAIRE ? ChatColor.GOLD + " Seul" : " avec " +
                 (camp == Camp.LIMULE ? ChatColor.DARK_GREEN :
                         camp == Camp.SHIZUE ? ChatColor.LIGHT_PURPLE :

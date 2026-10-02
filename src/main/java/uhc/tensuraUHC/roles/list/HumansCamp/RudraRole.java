@@ -51,17 +51,23 @@ public class RudraRole extends Role {
     private void giveTeammatesList(Player player) {
         StringBuilder str = new StringBuilder();
 
-        for (UUID pl : main.getGameManager().GetActivePlayers())
-        {
-            if (main.getRoleManager().getPlayerRole(pl).getCamp() == Camp.HUMAINS)
-            {
-                str.append(" ");
-                str.append(Bukkit.getPlayer(pl).getName());
+        if (main.getGameManager() != null && main.getRoleManager() != null) {
+            for (UUID pl : main.getGameManager().GetActivePlayers()) {
+                Role role = main.getRoleManager().getPlayerRole(pl);
+
+                if (role != null && role.getCamp() == Camp.HUMAINS) {
+                    Player target = Bukkit.getPlayer(pl);
+
+                    // On vérifie explicitement si le joueur est en ligne avant d'accéder à ses méthodes
+                    if (target != null && target.isOnline()) {
+                        str.append(" ").append(target.getName());
+                    }
+                }
             }
         }
+
         addPower("Liste des humains", str.toString());
     }
-
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
