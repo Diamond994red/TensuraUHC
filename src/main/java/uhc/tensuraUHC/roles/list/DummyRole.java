@@ -1,4 +1,4 @@
-package uhc.tensuraUHC.roles.list.OctagramCamp;
+package uhc.tensuraUHC.roles.list;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MillimRole extends Role {
+public class DummyRole extends Role {
 
 
-    public MillimRole(TensuraUHC main) {
-        super(main, "Millim", Camp.OCTAGRAMME, "");
+    public DummyRole(TensuraUHC main) {
+        super(main, "Dummy", Camp.OCTAGRAMME, "");
     }
 
     @Override

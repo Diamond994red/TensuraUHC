@@ -28,7 +28,9 @@ public class RudraRole extends Role {
     private boolean isSomeoneDead = false;
 
     public RudraRole(TensuraUHC main) {
-        super(main, "Rudra", Camp.HUMAINS, "");
+
+        super(main, "Rudra", Camp.HUMAINS, "Empereur suprême de l'Empire d'Orient et Premier Héros, " +
+                "vous tirez votre force de la survie de vos sujets.");
     }
 
     @Override
@@ -41,74 +43,25 @@ public class RudraRole extends Role {
         reset(player.getUniqueId());
         getItemsToGive().clear();
         isSomeoneDead = true;
-
-        // Active l'affichage de la vie uniquement pour Rudra
-        setupHealthDisplay(player);
-
         startHumainLeftCheck(player.getUniqueId());
+        giveTeammatesList(player);
         super.giveRole(player);
     }
 
-    /**
-     * Crée un Scoreboard privé pour Rudra lui permettant d'observer
-     * la vie (HP) des autres joueurs sous leur pseudo.
-     */
-    private void setupHealthDisplay(Player rudra) {
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+    private void giveTeammatesList(Player player) {
+        StringBuilder str = new StringBuilder();
 
-        // En 1.8.8, on utilise la chaîne "health"
-        Objective nameHealth = scoreboard.registerNewObjective("showHealthName", "health");
-        nameHealth.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        nameHealth.setDisplayName(ChatColor.RED + "❤");
-
-        // Assigne le scoreboard uniquement à Rudra
-        rudra.setScoreboard(scoreboard);
-
-        // Initialisation des HP de tous les joueurs sur le scoreboard de Rudra
-        for (Player target : Bukkit.getOnlinePlayers()) {
-            nameHealth.getScore(target.getName()).setScore((int) Math.ceil(target.getHealth()));
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player victim = ((Player) event.getEntity()).getPlayer();
-            syncHealthForRudra(victim);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerHeal(EntityRegainHealthEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player victim = ((Player) event.getEntity()).getPlayer();
-            syncHealthForRudra(victim);
-        }
-    }
-
-    /**
-     * Attend 1 tick pour lire la vie réelle de la victime et met à jour uniquement le scoreboard de Rudra.
-     */
-    private void syncHealthForRudra(Player victim) {
-        Bukkit.getScheduler().runTask(main, () -> {
-            if (!victim.isOnline()) return;
-
-            int healthScore = (int) Math.ceil(victim.getHealth());
-
-            for (UUID uuid : main.getGameManager().GetActivePlayers()) {
-                // S'assure que le joueur est en ligne ET qu'il a TOUJOURS ce rôle
-                if (main.getRoleManager().hasRole(uuid, this)) {
-                    Player rudra = Bukkit.getPlayer(uuid);
-                    if (rudra != null && rudra.isOnline()) {
-                        Objective obj = rudra.getScoreboard().getObjective("showHealthName");
-                        if (obj != null) {
-                            obj.getScore(victim.getName()).setScore(healthScore);
-                        }
-                    }
-                }
+        for (UUID pl : main.getGameManager().GetActivePlayers())
+        {
+            if (main.getRoleManager().getPlayerRole(pl).getCamp() == Camp.HUMAINS)
+            {
+                str.append(" ");
+                str.append(Bukkit.getPlayer(pl).getName());
             }
-        });
+        }
+        addPower("Liste des humains", str.toString());
     }
+
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {

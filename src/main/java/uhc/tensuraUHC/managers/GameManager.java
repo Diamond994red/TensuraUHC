@@ -24,7 +24,6 @@ public class GameManager {
     private int totalGameSeconds = 0;
     private boolean pvpActive = false;
     private boolean roleRevealed = false;
-    private boolean newEp = false;
     public void SetRolesRevealed(boolean b) { this.roleRevealed = b; }
     public boolean GetRolesRevealed() { return roleRevealed; }
     public int GetTotalGameSeconds() { return totalGameSeconds; }
@@ -65,17 +64,36 @@ public class GameManager {
         if (main.getGameWorld() == null) {
             main.createGameWorld();
         }
+
+        // 1. Arrêt du timer précédent si la partie tournait déjà
+        if (gameTask != null) {
+            gameTask.cancel();
+            gameTask = null;
+        }
+
+        // 2. Réinitialisation globale de l'état du jeu
         main.resetMinedDiamonds();
-        World world = main.getGameWorld();
-
-        // Utilisation de BorderManager au lancement de la partie
-        main.getBorderManager().setupInitialBorder(world);
-
+        main.getKills().clear();
         main.setGameStarted(true);
+        main.setMeetupActive(false);
         this.currentEpisode = 1;
         this.secondsInEpisode = 0;
         this.totalGameSeconds = 0;
         this.pvpActive = false;
+        this.roleRevealed = false;
+
+        // 3. Réinitialisation propre de TOUS les rôles enregistrés
+        for (Role role : main.getRoleManager().getRoles()) {
+            role.reset(null);
+        }
+        // Nettoyage des maps d'attribution des rôles
+        main.getRoleManager().getPlayerRoles().clear();
+        main.getRoleManager().getcurrentPlayerRoles().clear();
+
+        World world = main.getGameWorld();
+
+        // Utilisation de BorderManager au lancement de la partie
+        main.getBorderManager().setupInitialBorder(world);
 
         // Récupération dynamique des scénarios au lancement
         Scenario masterLevel = main.getScenarioManager().getScenario("MasterLevel");
@@ -130,17 +148,14 @@ public class GameManager {
 
     private void startLoop() {
         if (gameTask != null) gameTask.cancel();
+
         activePlayers.clear();
-        main.getRoleManager().getPlayerRoles().clear();
-        main.getRoleManager().getcurrentPlayerRoles().clear();
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getGameMode() == GameMode.SURVIVAL || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.CREATIVE) {
                 activePlayers.add(player.getUniqueId());
-                if (main.getRoleManager().hasRole(player.getUniqueId())) {
-                    main.getRoleManager().getPlayerRole(player.getUniqueId()).reset(player.getUniqueId());
-                }
             }
         }
+
         gameTask = new BukkitRunnable() {
             @Override
             public void run() {
@@ -148,61 +163,45 @@ public class GameManager {
                     cancel();
                     return;
                 }
-                //if (main.getRoleManager().getAliveCampsCount(activePlayers) <= 1 && totalGameSeconds >= main.GetRoleTime())
-                //{
-                //    WinGame(main.getRoleManager().FinalCamp());
-                //}
                 secondsInEpisode++;
                 totalGameSeconds++;
                 if (totalGameSeconds == 60) {
                     main.getNoDamagePlayers().clear();
                     Bukkit.broadcastMessage(ChatColor.RED + "[TensuraUHC] Les dégâts sont désormais ACTIFS !");
                 }
-
                 if (totalGameSeconds == main.GetPvpTime() && !pvpActive) {
                     pvpActive = true;
                     Bukkit.broadcastMessage(ChatColor.RED + "[TensuraUHC] Le PvP est désormais ACTIF !");
                 }
-
                 if (totalGameSeconds == main.GetFinalHealTime()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.setHealth(player.getMaxHealth());
                     }
                     Bukkit.broadcastMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.GREEN + "Final Heal ! Tous les joueurs ont été soignés !");
                 }
-                if (newEp) {
-                    newEp = false;
-                }
-
                 if (totalGameSeconds == main.GetRoleTime()) {
-
                     // Distribution des rôles aux joueurs en jeu
                     main.getRoleManager().distributeRoles(activePlayers);
                     SetRolesRevealed(true);
                 }
-
                 // Déclenchement du Meetup et lancement de la bordure via BorderManager
                 if (totalGameSeconds == main.getMeetupTime() && !main.isMeetupActive()) {
                     main.setMeetupActive(true);
                     Bukkit.broadcastMessage(ChatColor.GOLD + "[TensuraUHC] " + ChatColor.RED + "Le Meetup est actif !");
                     main.getBorderManager().startBorderShrink(main.getGameWorld());
                 }
-
                 if (secondsInEpisode >= main.getEpisodeLengthSeconds()) {
                     secondsInEpisode = 0;
                     currentEpisode++;
-                    newEp = true;
                     Bukkit.broadcastMessage(ChatColor.GOLD + "================-================");
                     Bukkit.broadcastMessage(ChatColor.YELLOW + "   Début de l'Épisode " + currentEpisode);
                     Bukkit.broadcastMessage(ChatColor.GOLD + "=================================");
                 }
-
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     main.getScoreboardManager().updateGameScoreboard(p);
                 }
             }
         };
-
         gameTask.runTaskTimer(main, 20L, 20L);
     }
 
@@ -263,5 +262,4 @@ public class GameManager {
     public int getSecondsInEpisode() { return secondsInEpisode; }
     public int getTotalGameSeconds() { return totalGameSeconds; }
     public boolean isPvpActive() { return pvpActive; }
-    public boolean IsNewEp() {return newEp; }
 }
