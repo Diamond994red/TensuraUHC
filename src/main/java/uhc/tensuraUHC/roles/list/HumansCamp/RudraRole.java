@@ -35,20 +35,6 @@ public class RudraRole extends Role {
 
     @Override
     public void FakeRoleMessage(Player sender) {
-
-    }
-
-    @Override
-    public void giveRole(Player player) {
-        reset(player.getUniqueId());
-        getItemsToGive().clear();
-        isSomeoneDead = true;
-        startHumainLeftCheck(player.getUniqueId());
-        giveTeammatesList(player);
-        super.giveRole(player);
-    }
-
-    private void giveTeammatesList(Player player) {
         StringBuilder str = new StringBuilder();
 
         if (main.getGameManager() != null && main.getRoleManager() != null) {
@@ -66,7 +52,16 @@ public class RudraRole extends Role {
             }
         }
 
-        addPower("Liste des humains", str.toString());
+        sender.sendMessage(ChatColor.AQUA +  "Liste des humains : " + str);
+    }
+
+    @Override
+    public void giveRole(Player player) {
+        reset(player.getUniqueId());
+        getItemsToGive().clear();
+        isSomeoneDead = true;
+        startHumainLeftCheck(player.getUniqueId());
+        super.giveRole(player);
     }
 
     @EventHandler

@@ -8,6 +8,7 @@ import uhc.tensuraUHC.roles.list.ClownsCamp.ClaymanRole;
 import uhc.tensuraUHC.roles.list.HumansCamp.KondouRole;
 import uhc.tensuraUHC.roles.list.HumansCamp.RudraRole;
 import uhc.tensuraUHC.roles.list.MonstersCamp.*;
+import uhc.tensuraUHC.roles.list.OctagramCamp.MilimRole;
 import uhc.tensuraUHC.roles.list.SoloCamp.*;
 
 import java.util.*;
@@ -35,6 +36,7 @@ public class RoleManager {
         addRole(new RudraRole(main));
         addRole(new KondouRole(main));
         addRole(new ClaymanRole(main));
+        addRole(new MilimRole(main));
     }
 
     /**
